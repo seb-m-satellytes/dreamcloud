@@ -2,19 +2,9 @@
 
 import os
 from os.path import join
-import sys
-
-from beeref import constants
-
+import platform
 
 block_cipher = None
-appname = f'{constants.APPNAME}-{constants.VERSION}'
-
-if sys.platform.startswith('win'):
-    icon = 'logo.ico'
-else:
-    icon = 'logo.icns'  # For OSX; param gets ignored on Linux
-
 
 a = Analysis(
     [join('beeref', '__main__.py')],
@@ -35,6 +25,18 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+from beeref import constants
+
+operating_system = platform.system()
+architecture = platform.processor()
+
+if operating_system.startswith('Win'):
+    icon = 'logo.ico'
+else:
+    icon = 'logo.icns'  # For OSX; param gets ignored on Linux
+
+executable_name = f'{constants.APPNAME}'
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -42,7 +44,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name=appname,
+    name=executable_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -56,10 +58,10 @@ exe = EXE(
     entitlements_file=None ,
     icon=join('beeref', 'assets', icon))
 
-if sys.platform == 'darwin':
+if operating_system == 'Darwin':
     app = BUNDLE(
         exe,
-        name=f'{constants.APPNAME}.app',
+        name=f'{executable_name}.app',
         icon=join('beeref', 'assets', icon),
         bundle_identifier='org.beeref.app',
         version=f'{constants.VERSION}',
@@ -71,3 +73,4 @@ if sys.platform == 'darwin':
                 }
             ]
         })
+    
