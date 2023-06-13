@@ -33,6 +33,12 @@ actions = [
         'callback': 'on_action_save_as',
     },
     {
+        'id': 'save_to_cloud',
+        'text': 'Save to cloud',
+        'shortcuts': [],
+        'callback': 'on_action_save_cloud',
+    },
+    {
         'id': 'quit',
         'text': '&Quit',
         'shortcuts': ['Ctrl+Q'],

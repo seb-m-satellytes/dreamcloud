@@ -110,7 +110,7 @@ def main():
     app = BeeRefApplication(sys.argv)
     palette = create_palette_from_dict(constants.COLORS)
     app.setPalette(palette)
-    firebase.fetch_default_user_name()
+    
 
     bee = BeeRefMainWindow(app)  # NOQA:F841
 

@@ -30,6 +30,7 @@ from beeref import widgets
 from beeref.items import BeePixmapItem, BeeTextItem
 from beeref.main_controls import MainControlsMixin
 from beeref.scene import BeeGraphicsScene
+from beeref.fileio import load_board
 
 
 commandline_args = CommandlineArgs()
@@ -83,6 +84,8 @@ class BeeGraphicsView(MainControlsMixin,
         if commandline_args.filename:
             self.open_from_file(commandline_args.filename)
         self.update_window_title()
+
+        load_board(self.scene)
 
     @property
     def filename(self):
@@ -370,6 +373,15 @@ class BeeGraphicsView(MainControlsMixin,
             parent=self)
         self.worker.start()
 
+    def do_save_cloud(self):
+        self.worker = fileio.ThreadedIO(fileio.save_bee_cloud, self.scene)
+        self.worker.finished.connect(self.on_saving_finished)
+        # self.progress = widgets.BeeProgressDialog(
+        #    'Saving to cloud...',
+        #    worker=self.worker,
+        #    parent=self)
+        self.worker.start()
+
     def on_action_save_as(self):
         self.scene.cancel_crop_mode()
         filename, f = QtWidgets.QFileDialog.getSaveFileName(
@@ -385,6 +397,10 @@ class BeeGraphicsView(MainControlsMixin,
             self.on_action_save_as()
         else:
             self.do_save(self.filename, create_new=False)
+
+    def on_action_save_cloud(self):
+        self.scene.cancel_crop_mode()
+        self.do_save_cloud()
 
     def on_action_quit(self):
         logger.info('User quit. Exiting...')
