@@ -19,6 +19,7 @@ import logging
 import platform
 import signal
 import sys
+import firebase
 
 from PyQt6 import QtCore, QtWidgets
 
@@ -109,6 +110,7 @@ def main():
     app = BeeRefApplication(sys.argv)
     palette = create_palette_from_dict(constants.COLORS)
     app.setPalette(palette)
+    firebase.fetch_default_user_name()
 
     bee = BeeRefMainWindow(app)  # NOQA:F841
 
