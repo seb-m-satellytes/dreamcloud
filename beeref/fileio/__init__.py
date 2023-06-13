@@ -26,6 +26,8 @@ from beeref import firebase
 from datetime import datetime
 from firebase_admin import storage
 from urllib.parse import quote
+import uuid
+import os
 
 __all__ = [
     'is_bee_file',
@@ -111,12 +113,17 @@ def save_bee_cloud(scene, worker=None):
         # Get image data and upload to Cloud Storage
         data = item.pixmap_to_bytes()
         print(item)
-        filename = f'some_file_name_1_{i}.png'
+        filepath = os.path.basename(item.filename)
+        filename = filepath.replace(" ", "-").lower()
+
         image_url = upload_to_firebase(data, filename)
+        image_uuid = str(uuid.uuid4())
         
         # Create a new image document in Firestore under the board document
         image_data = {
-            "url": filename,
+            "filename": filename,
+            "storage_url": image_url,
+            "uuid": image_uuid,
             "x": item.x(),
             "y": item.y(),
             "z": item.zValue(),
@@ -125,7 +132,7 @@ def save_bee_cloud(scene, worker=None):
             "flip": item.flip(),
         }
 
-        board_ref.add(image_data)
+        board_ref.document(image_uuid).set(image_data)
 
         # Update the progress if a worker was provided
         if worker:
@@ -155,16 +162,16 @@ def load_board(scene):
         # Iterate over each image
         for image_doc in images_docs:
             image_data = image_doc.to_dict()
-            logger.info(f'Loading image from file {image_data["url"]}')
+            logger.info(f'Loading image from file {image_data["storage_url"]}')
             
             # Download the image from Cloud Storage
             # TODO: Adjust the following code to match your actual image data
-            blob = bucket.blob(image_data["url"])
+            blob = bucket.blob(image_data["storage_url"])
             image_data_bytes = blob.download_as_bytes()
 
             img = QtGui.QImage.fromData(image_data_bytes)
             
-            item = BeePixmapItem(img, 'test')
+            item = BeePixmapItem(img, image_data["filename"])
             item.set_pos_center(QtCore.QPointF(image_data["x"], image_data["y"]))
             print('==>', item)
         
