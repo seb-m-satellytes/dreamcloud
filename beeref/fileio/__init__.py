@@ -106,7 +106,7 @@ def save_bee_cloud(scene, worker=None):
         }
         _, doc_ref = db.collection("boards").add(board_data)
     
-    board_ref = db.collection("boards").document(doc_ref.id).collection("images")
+    board_images_ref = db.collection("boards").document(doc_ref.id).collection("images")
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
@@ -132,7 +132,7 @@ def save_bee_cloud(scene, worker=None):
             "flip": item.flip(),
         }
 
-        board_ref.document(image_uuid).set(image_data)
+        board_images_ref.document(image_uuid).set(image_data)
 
         # Update the progress if a worker was provided
         if worker:

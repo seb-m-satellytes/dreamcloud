@@ -70,7 +70,7 @@ class BeeGraphicsView(MainControlsMixin,
         self.setScene(self.scene)
 
         # self.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-        # self.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # self.setRenderHint(QPainter.RenderHint.TextAntialiasing)
         # self.setRenderHint(QPainter.RenderHint.LosslessImageRendering)
         # self.setRenderHint(QPainter.RenderHint.VerticalSubpixelPositioning)
