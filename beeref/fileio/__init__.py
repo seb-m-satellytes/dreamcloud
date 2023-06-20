@@ -64,7 +64,6 @@ def fetch_boards():
     docs = boards_ref.stream()
     boards = []
     for doc in docs:
-        print(f'{doc.id} => {doc.to_dict()}')
         board = doc.to_dict()
         board["id"] = doc.id
         boards.append(board)
@@ -78,15 +77,6 @@ def upload_to_firebase(file_data, file_name):
     blob.upload_from_string(
         file_data, content_type='image/png'
     )
-
-    # Make the blob public. This is not necessary if the
-    # entire bucket is public.
-    # See https://cloud.google.com/storage/docs/access-control/making-data-public.
-    blob.make_public()
-
-    # The public URL can be used to directly access the uploaded file via HTTP.
-    print(blob.public_url)
-    return blob.public_url
 
 def save_bee_cloud(scene, worker=None):
     logger.info('Saving...')
@@ -111,7 +101,6 @@ def save_bee_cloud(scene, worker=None):
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
-        # print(item, item.isNew, item.hasChanged, item.data(0))
         item_uuid = item.data(0).strip()
     
         
@@ -121,9 +110,8 @@ def save_bee_cloud(scene, worker=None):
             filepath = os.path.basename(item.filename)
             filename = filepath.replace(" ", "-").lower()
 
-            image_url = upload_to_firebase(data, filename)
+            upload_to_firebase(data, filename)
             image_uuid = str(uuid.uuid4())
-            print(image_url)
             
             # Create a new image document in Firestore under the board document
             image_data = {
@@ -205,8 +193,6 @@ def load_board(scene):
           
             scene.addItem(item)
             items.append(item)
-            # scene.addItem(pixmap)
-
 
 def load_images(filenames, pos, scene, worker):
     """Add images to existing scene."""

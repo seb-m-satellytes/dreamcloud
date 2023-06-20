@@ -86,10 +86,11 @@ class BeeGraphicsView(MainControlsMixin,
         self.update_window_title()
 
         load_board(self.scene)
-
+        QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
+        
         self.timer = QTimer()
         self.timer.timeout.connect(lambda: save_bee_cloud(self.scene))
-        self.timer.start(30000)
+        self.timer.start(60000)
 
     @property
     def filename(self):
