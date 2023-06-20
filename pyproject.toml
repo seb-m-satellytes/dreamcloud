@@ -28,6 +28,7 @@ dependencies = [
     "PyQt6>=6.5.1",
     "rectangle-packer>=2.0.1",
     "firebase-admin>=6.1.0",
+    "python-dotenv>=1.0.0",
 ]
 license = {text = "LICENSE"}
 requires-python = "==3.10.*"

@@ -28,6 +28,7 @@ from beeref.assets import BeeAssets
 from beeref.config import CommandlineArgs, BeeSettings, logfile_name
 from beeref.utils import create_palette_from_dict
 from beeref.view import BeeGraphicsView
+from beeref.user import LoginDialog
 
 logger = logging.getLogger(__name__)
 
@@ -107,19 +108,25 @@ def main():
     logger.info(f'Using settings: {settings.fileName()}')
     logger.info(f'Logging to: {logfile_name()}')
     CommandlineArgs(with_check=True)  # Force checking
-    app = BeeRefApplication(sys.argv)
     palette = create_palette_from_dict(constants.COLORS)
+    app = BeeRefApplication(sys.argv)
     app.setPalette(palette)
     
-
-    bee = BeeRefMainWindow(app)  # NOQA:F841
-
     signal.signal(signal.SIGINT, handle_sigint)
     # Repeatedly run python-noop to give the interpreter time to
     # handle signals
     safe_timer(50, lambda: None)
 
+    login_dialog = LoginDialog()
+    if login_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+        bee = BeeRefMainWindow(app)  # NOQA:F841
+        print('Login accepted')
+    else:
+        sys.exit()
+
     app.exec()
+
+    # app.exec()
     del bee
     del app
     logger.debug('BeeRef closed')

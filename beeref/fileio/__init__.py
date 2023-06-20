@@ -28,6 +28,7 @@ from firebase_admin import storage, firestore
 from urllib.parse import quote
 import uuid
 import os
+import beeref.user_instance as user_instance
 
 __all__ = [
     'is_bee_file',
@@ -60,13 +61,28 @@ def save_bee(filename, scene, create_new=False, worker=None):
 def fetch_boards():
     """Fetch all board documents from Firestore."""
     db = firebase.get_firestore()
-    boards_ref = db.collection("boards")
-    docs = boards_ref.stream()
-    boards = []
-    for doc in docs:
-        board = doc.to_dict()
-        board["id"] = doc.id
-        boards.append(board)
+
+    # Get reference to the users collection
+    users_ref = db.collection("users")
+    
+    # Fetch the user document
+    user_doc = users_ref.document(user_instance.user.id).get()
+    if user_doc.exists:
+        # Get the list of board ids associated with the user
+        board_ids = user_doc.to_dict().get("boards", [])
+
+        boards_ref = db.collection("boards")
+        docs = boards_ref.stream()
+        boards = []
+        for board_id in board_ids:
+            board_doc = boards_ref.document(board_id).get()
+            if board_doc.exists:
+                board = board_doc.to_dict()
+                board["id"] = board_doc.id
+                boards.append(board)
+    else:
+        boards = []
+
     return boards
 
 def upload_to_firebase(file_data, file_name):
@@ -178,7 +194,6 @@ def load_board(scene):
             logger.info(f'Loading image from file {image_data["storage_url"]}')
             
             # Download the image from Cloud Storage
-            # TODO: Adjust the following code to match your actual image data
             blob = bucket.blob(image_data["storage_url"])
             image_data_bytes = blob.download_as_bytes()
 
