@@ -64,7 +64,7 @@ def fetch_boards():
 
     # Get reference to the users collection
     users_ref = db.collection("users")
-    
+
     # Fetch the user document
     user_doc = users_ref.document(user_instance.user.id).get()
     if user_doc.exists:
