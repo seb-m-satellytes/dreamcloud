@@ -12,11 +12,14 @@ if not firebase_admin._apps:
 db = firestore.client()
 bucket = storage.bucket()
 
+
 def get_firestore():
     return db
 
+
 def get_storage():
     return bucket
+
 
 def fetch_default_user_name():
     # Get a reference to the 'default-user' collection

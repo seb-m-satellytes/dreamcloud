@@ -2,7 +2,7 @@ __all__ = [
     'LoginDialog',
 ]
 
-from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLineEdit, QLabel, QPushButton, QMessageBox
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QLabel, QPushButton, QMessageBox
 import requests
 from dotenv import load_dotenv
 import os
@@ -10,9 +10,11 @@ import dreamboard.user_instance as user_instance
 
 load_dotenv()
 
+
 class User:
     def __init__(self, user_id):
         self.id = user_id
+
 
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
@@ -75,5 +77,3 @@ class LoginDialog(QDialog):
             print('Login failed:', response.content)
             QMessageBox.warning(self, "Login failed", "Incorrect email or password.")
             self.reject()
-
-        

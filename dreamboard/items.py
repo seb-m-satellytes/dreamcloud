@@ -433,11 +433,11 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
         self.isNew = True
 
     def itemChange(self, change, value):
-        
         if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange:
             self.hasChanged = True
 
         return super().itemChange(change, value)
+
 
 @register_item
 class DreambTextItem(DreambItemMixin, QtWidgets.QGraphicsTextItem):

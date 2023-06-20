@@ -110,7 +110,7 @@ def main():
     palette = create_palette_from_dict(constants.COLORS)
     app = DreamBoardApplication(sys.argv)
     app.setPalette(palette)
-    
+
     signal.signal(signal.SIGINT, handle_sigint)
     # Repeatedly run python-noop to give the interpreter time to
     # handle signals

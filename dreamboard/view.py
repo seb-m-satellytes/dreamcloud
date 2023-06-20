@@ -37,9 +37,7 @@ commandline_args = CommandlineArgs()
 logger = logging.getLogger(__name__)
 
 
-class DreambGraphicsView(MainControlsMixin,
-                      QtWidgets.QGraphicsView,
-                      ActionsMixin):
+class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixin):
 
     def __init__(self, app, parent=None):
         super().__init__(parent)
@@ -87,7 +85,7 @@ class DreambGraphicsView(MainControlsMixin,
 
         load_board(self.scene)
         QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
-        
+
         self.timer = QTimer()
         self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene))
         self.timer.start(60000)
@@ -729,4 +727,3 @@ class DreambGraphicsView(MainControlsMixin,
         super().resizeEvent(event)
         self.recalc_scene_rect()
         self.welcome_overlay.resize(self.size())
-

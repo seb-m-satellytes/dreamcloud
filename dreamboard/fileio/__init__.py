@@ -25,7 +25,7 @@ from dreamboard.items import DreambPixmapItem
 from dreamboard import firebase
 from datetime import datetime
 from firebase_admin import storage, firestore
-from urllib.parse import quote
+
 import uuid
 import os
 import dreamboard.user_instance as user_instance
@@ -72,7 +72,7 @@ def fetch_boards():
         board_ids = user_doc.to_dict().get("boards", [])
 
         boards_ref = db.collection("boards")
-        docs = boards_ref.stream()
+
         boards = []
         for board_id in board_ids:
             board_doc = boards_ref.document(board_id).get()
@@ -85,6 +85,7 @@ def fetch_boards():
 
     return boards
 
+
 def upload_to_firebase(file_data, file_name):
     bucket = storage.bucket()
     # Create a new blob and upload the file's content.
@@ -93,6 +94,7 @@ def upload_to_firebase(file_data, file_name):
     blob.upload_from_string(
         file_data, content_type='image/png'
     )
+
 
 def save_dreamb_cloud(scene, worker=None):
     logger.info('Saving...')
@@ -112,14 +114,13 @@ def save_dreamb_cloud(scene, worker=None):
             "name": "Board Name"  # use actual board name here
         }
         _, doc_ref = db.collection("boards").add(board_data)
-    
+
     board_images_ref = db.collection("boards").document(doc_ref.id).collection("images")
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
         item_uuid = item.data(0).strip()
-    
-        
+
         if (item.isNew):
             # Get image data and upload to Cloud Storage
             data = item.pixmap_to_bytes()
@@ -128,7 +129,7 @@ def save_dreamb_cloud(scene, worker=None):
 
             upload_to_firebase(data, filename)
             image_uuid = str(uuid.uuid4())
-            
+
             # Create a new image document in Firestore under the board document
             image_data = {
                 "filename": filename,
@@ -176,7 +177,7 @@ def load_board(scene):
 
     # Fetch all boards
     boards = fetch_boards()
-    
+
     # TODO: Add a way to select which board to load
     # For this example, let's just load the first board
     if len(boards) > 0:
@@ -192,22 +193,23 @@ def load_board(scene):
         for image_doc in images_docs:
             image_data = image_doc.to_dict()
             logger.info(f'Loading image from file {image_data["storage_url"]}')
-            
+
             # Download the image from Cloud Storage
             blob = bucket.blob(image_data["storage_url"])
             image_data_bytes = blob.download_as_bytes()
 
             img = QtGui.QImage.fromData(image_data_bytes)
-            
+
             item = DreambPixmapItem(img, image_data["filename"])
             item.set_pos_center(QtCore.QPointF(image_data["x"], image_data["y"]))
             item.setRotation(image_data["rotation"])
             item.setScale(image_data["scale"])
-            
+
             item.setData(0, image_data["uuid"])
-          
+
             scene.addItem(item)
             items.append(item)
+
 
 def load_images(filenames, pos, scene, worker):
     """Add images to existing scene."""

@@ -14,7 +14,8 @@
 # along with DreamBoard.  If not, see <https://www.gnu.org/licenses/>.
 
 from PyQt6 import QtCore, QtGui
-    
+
+
 class InsertItems(QtGui.QUndoCommand):
 
     def __init__(self, scene, items, position=None, ignore_first_redo=False):
