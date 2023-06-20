@@ -14,8 +14,7 @@
 # along with BeeRef.  If not, see <https://www.gnu.org/licenses/>.
 
 from PyQt6 import QtCore, QtGui
-
-
+    
 class InsertItems(QtGui.QUndoCommand):
 
     def __init__(self, scene, items, position=None, ignore_first_redo=False):
@@ -37,6 +36,7 @@ class InsertItems(QtGui.QUndoCommand):
                 item.setPos(item.pos() + self.position - rect.center())
         self.scene.clearSelection()
         for item in self.items:
+            item.setHasChanged()
             self.scene.addItem(item)
             item.setSelected(True)
 
@@ -58,6 +58,7 @@ class DeleteItems(QtGui.QUndoCommand):
 
     def redo(self):
         for item in self.items:
+            item.setHasChanged()
             self.scene.removeItem(item)
 
     def undo(self):
@@ -80,6 +81,7 @@ class MoveItemsBy(QtGui.QUndoCommand):
             self.ignore_first_redo = False
             return
         for item in self.items:
+            item.setHasChanged()
             item.moveBy(self.delta.x(), self.delta.y())
 
     def undo(self):
@@ -102,6 +104,7 @@ class ScaleItemsBy(QtGui.QUndoCommand):
             self.ignore_first_redo = False
             return
         for item in self.items:
+            item.setHasChanged()
             item.setScale(item.scale() * self.factor,
                           item.mapFromScene(self.anchor))
 
@@ -132,6 +135,7 @@ class RotateItemsBy(QtGui.QUndoCommand):
 
     def undo(self):
         for item in self.items:
+            item.setHasChanged()
             item.setRotation(item.rotation() - self.delta * item.flip(),
                              item.mapFromScene(self.anchor))
 

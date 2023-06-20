@@ -20,6 +20,7 @@ text).
 import logging
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtWidgets import QGraphicsItem
 from PyQt6.QtCore import Qt
 
 from beeref import commands
@@ -42,7 +43,6 @@ class BeeItemMixin(SelectableMixin):
 
     def set_pos_center(self, pos):
         """Sets the position using the item's center as the origin point."""
-
         self.setPos(pos - self.center_scene_coords)
 
     def has_selection_outline(self):
@@ -90,6 +90,8 @@ class BeePixmapItem(BeeItemMixin, QtWidgets.QGraphicsPixmapItem):
         logger.debug(f'Initialized {self}')
         self.is_croppable = True
         self.crop_mode = False
+        self.hasChanged = False
+        self.isNew = False
         self.init_selectable()
 
     @classmethod
@@ -424,6 +426,18 @@ class BeePixmapItem(BeeItemMixin, QtWidgets.QGraphicsPixmapItem):
         else:
             super().mouseReleaseEvent(event)
 
+    def setHasChanged(self):
+        self.hasChanged = True
+
+    def setIsNew(self):
+        self.isNew = True
+
+    def itemChange(self, change, value):
+        
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange:
+            self.hasChanged = True
+
+        return super().itemChange(change, value)
 
 @register_item
 class BeeTextItem(BeeItemMixin, QtWidgets.QGraphicsTextItem):

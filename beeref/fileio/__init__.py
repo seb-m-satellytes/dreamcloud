@@ -24,7 +24,7 @@ from beeref.fileio.sql import SQLiteIO, is_bee_file
 from beeref.items import BeePixmapItem
 from beeref import firebase
 from datetime import datetime
-from firebase_admin import storage
+from firebase_admin import storage, firestore
 from urllib.parse import quote
 import uuid
 import os
@@ -89,6 +89,7 @@ def upload_to_firebase(file_data, file_name):
     return blob.public_url
 
 def save_bee_cloud(scene, worker=None):
+    logger.info('Saving...')
     # Get Firestore client and Cloud Storage bucket
     db = firebase.get_firestore()
 
@@ -110,35 +111,59 @@ def save_bee_cloud(scene, worker=None):
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
-        # Get image data and upload to Cloud Storage
-        data = item.pixmap_to_bytes()
-        print(item)
-        filepath = os.path.basename(item.filename)
-        filename = filepath.replace(" ", "-").lower()
-
-        image_url = upload_to_firebase(data, filename)
-        image_uuid = str(uuid.uuid4())
+        # print(item, item.isNew, item.hasChanged, item.data(0))
+        item_uuid = item.data(0).strip()
+    
         
-        # Create a new image document in Firestore under the board document
-        image_data = {
-            "filename": filename,
-            "storage_url": image_url,
-            "uuid": image_uuid,
-            "x": item.x(),
-            "y": item.y(),
-            "z": item.zValue(),
-            "scale": item.scale(),
-            "rotation": item.rotation(),
-            "flip": item.flip(),
-        }
+        if (item.isNew):
+            # Get image data and upload to Cloud Storage
+            data = item.pixmap_to_bytes()
+            filepath = os.path.basename(item.filename)
+            filename = filepath.replace(" ", "-").lower()
 
-        board_images_ref.document(image_uuid).set(image_data)
+            image_url = upload_to_firebase(data, filename)
+            image_uuid = str(uuid.uuid4())
+            print(image_url)
+            
+            # Create a new image document in Firestore under the board document
+            image_data = {
+                "filename": filename,
+                "storage_url": filename,
+                "uuid": image_uuid,
+                "x": item.x(),
+                "y": item.y(),
+                "z": item.zValue(),
+                "scale": item.scale(),
+                "rotation": item.rotation(),
+                "flip": item.flip(),
+                "created_at": firestore.SERVER_TIMESTAMP
+            }
+
+            try:
+                board_images_ref.document(image_uuid).set(image_data)
+                logger.info('Saved new image to cloud.')
+            except Exception as e:
+                logger.error('Error saving new image to cloud with error: ' + str(e))
+        else:
+            updated_image_data = {
+                "x": item.x(),
+                "y": item.y(),
+                "z": item.zValue(),
+                "scale": item.scale(),
+                "rotation": item.rotation(),
+                "flip": item.flip(),
+                "updated_at": firestore.SERVER_TIMESTAMP
+            }
+
+            try:
+                board_images_ref.document(item_uuid).update(updated_image_data)
+            except Exception as e:
+                logger.error('Error updating image to cloud with error: ' + str(e))
 
         # Update the progress if a worker was provided
         if worker:
             worker.progress.emit(i)
 
-    logger.info('Saved!')
 
 def load_board(scene):
     # Get Firestore client and Cloud Storage bucket
@@ -173,8 +198,11 @@ def load_board(scene):
             
             item = BeePixmapItem(img, image_data["filename"])
             item.set_pos_center(QtCore.QPointF(image_data["x"], image_data["y"]))
-            print('==>', item)
-        
+            item.setRotation(image_data["rotation"])
+            item.setScale(image_data["scale"])
+            
+            item.setData(0, image_data["uuid"])
+          
             scene.addItem(item)
             items.append(item)
             # scene.addItem(pixmap)
@@ -197,6 +225,8 @@ def load_images(filenames, pos, scene, worker):
 
         item = BeePixmapItem(img, filename)
         item.set_pos_center(pos)
+        item.setHasChanged()
+        item.setIsNew()
         scene.add_item_later({'item': item, 'type': 'pixmap'}, selected=True)
         items.append(item)
         if worker.canceled:

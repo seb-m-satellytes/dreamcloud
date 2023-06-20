@@ -19,7 +19,7 @@ import os
 import os.path
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 
 from beeref.actions import ActionsMixin
 from beeref import commands
@@ -30,7 +30,7 @@ from beeref import widgets
 from beeref.items import BeePixmapItem, BeeTextItem
 from beeref.main_controls import MainControlsMixin
 from beeref.scene import BeeGraphicsScene
-from beeref.fileio import load_board
+from beeref.fileio import load_board, save_bee_cloud
 
 
 commandline_args = CommandlineArgs()
@@ -86,6 +86,10 @@ class BeeGraphicsView(MainControlsMixin,
         self.update_window_title()
 
         load_board(self.scene)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(lambda: save_bee_cloud(self.scene))
+        self.timer.start(30000)
 
     @property
     def filename(self):
@@ -403,6 +407,7 @@ class BeeGraphicsView(MainControlsMixin,
         self.do_save_cloud()
 
     def on_action_quit(self):
+        self.timer.stop()
         logger.info('User quit. Exiting...')
         self.app.quit()
 
@@ -723,3 +728,4 @@ class BeeGraphicsView(MainControlsMixin,
         super().resizeEvent(event)
         self.recalc_scene_rect()
         self.welcome_overlay.resize(self.size())
+

@@ -118,7 +118,6 @@ class BaseItemMixin:
         """The item's center in scene coordinates."""
         return self.mapToScene(self.center)
 
-
 class SelectableMixin(BaseItemMixin):
     """Common code for selectable items: Selection outline, handles etc."""
 
@@ -358,7 +357,7 @@ class SelectableMixin(BaseItemMixin):
     def hoverMoveEvent(self, event):
         if not self.has_selection_handles():
             return
-
+        
         if event.pos() in self.select_handle_free_center():
             # This area should always trigger regular move operations,
             # even if it is covered by selection scale/flip/... handles.

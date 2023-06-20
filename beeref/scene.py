@@ -18,7 +18,7 @@ import logging
 import math
 
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 
 import rpack
 
