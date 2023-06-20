@@ -9,7 +9,7 @@ import plum
 
 from PyQt6 import QtCore, QtGui
 
-from beeref.fileio.image import exif_rotated_image, load_image
+from dreamboard.fileio.image import exif_rotated_image, load_image
 
 
 def test_exif_rotated_image_without_path(qapp):
@@ -23,7 +23,7 @@ def test_exif_rotated_image_not_a_file(qapp):
 
 
 def test_exif_rotated_image_exif_unpack_error(qapp, imgfilename3x3):
-    with patch('beeref.fileio.image.exif.Image',
+    with patch('dreamboard.fileio.image.exif.Image',
                side_effect=plum.exceptions.UnpackError()):
         img = exif_rotated_image(imgfilename3x3)
         assert img.isNull() is False

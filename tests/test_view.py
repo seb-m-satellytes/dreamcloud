@@ -6,55 +6,55 @@ from unittest.mock import MagicMock, patch, mock_open
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from beeref.config import logfile_name
-from beeref.items import BeePixmapItem, BeeTextItem
-from beeref.view import BeeGraphicsView
+from dreamboard.config import logfile_name
+from dreamboard.items import DreambPixmapItem, DreambTextItem
+from dreamboard.view import DreambGraphicsView
 
 
 def test_inits_menu(view, qapp):
     parent = QtWidgets.QMainWindow()
-    view = BeeGraphicsView(qapp, parent)
+    view = DreambGraphicsView(qapp, parent)
     assert isinstance(view.context_menu, QtWidgets.QMenu)
     assert len(view.actions()) > 0
-    assert view.bee_actions
-    assert view.bee_actiongroups
+    assert view.dreamb_actions
+    assert view.dreamb_actiongroups
 
 
-@patch('beeref.view.BeeGraphicsView.open_from_file')
+@patch('dreamboard.view.DreambGraphicsView.open_from_file')
 def test_init_without_filename(open_file_mock, qapp, commandline_args):
     commandline_args.filename = None
     parent = QtWidgets.QMainWindow()
-    view = BeeGraphicsView(qapp, parent)
+    view = DreambGraphicsView(qapp, parent)
     open_file_mock.assert_not_called()
-    assert view.parent.windowTitle() == 'BeeRef'
+    assert view.parent.windowTitle() == 'DreamBoard'
     del view
 
 
-@patch('beeref.view.BeeGraphicsView.open_from_file')
+@patch('dreamboard.view.DreambGraphicsView.open_from_file')
 def test_init_with_filename(open_file_mock, view, qapp, commandline_args):
-    commandline_args.filename = 'test.bee'
+    commandline_args.filename = 'test.dreamb'
     parent = QtWidgets.QMainWindow()
-    view = BeeGraphicsView(qapp, parent)
-    open_file_mock.assert_called_once_with('test.bee')
+    view = DreambGraphicsView(qapp, parent)
+    open_file_mock.assert_called_once_with('test.dreamb')
     del view
 
 
-@patch('beeref.widgets.WelcomeOverlay.hide')
+@patch('dreamboard.widgets.WelcomeOverlay.hide')
 def test_on_scene_changed_when_items(hide_mock, view):
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
     view.scale(2, 2)
-    with patch('beeref.view.BeeGraphicsView.recalc_scene_rect') as r:
+    with patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect') as r:
         view.on_scene_changed(None)
         r.assert_called_once_with()
         hide_mock.assert_called_once_with()
         assert view.get_scale() == 2
 
 
-@patch('beeref.widgets.WelcomeOverlay.show')
+@patch('dreamboard.widgets.WelcomeOverlay.show')
 def test_on_scene_changed_when_no_items(show_mock, view):
     view.scale(2, 2)
-    with patch('beeref.view.BeeGraphicsView.recalc_scene_rect') as r:
+    with patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect') as r:
         view.on_scene_changed(None)
         r.assert_called()
         show_mock.assert_called_once_with()
@@ -71,7 +71,7 @@ def test_clear_scene(view, item):
     view.scene.addItem(item)
     view.scale(2, 2)
     view.translate(123, 456)
-    view.filename = 'test.bee'
+    view.filename = 'test.dreamb'
     view.undo_stack = MagicMock()
 
     view.clear_scene()
@@ -79,7 +79,7 @@ def test_clear_scene(view, item):
     assert view.transform().isIdentity()
     assert view.filename is None
     view.undo_stack.clear.assert_called_once_with()
-    assert view.parent.windowTitle() == 'BeeRef'
+    assert view.parent.windowTitle() == 'DreamBoard'
 
 
 def test_reset_previous_transform_when_other_item(view):
@@ -106,7 +106,7 @@ def test_reset_previous_transform_when_same_item(view):
     }
 
 
-@patch('beeref.view.BeeGraphicsView.fitInView')
+@patch('dreamboard.view.DreambGraphicsView.fitInView')
 def test_fit_rect_no_toggle(fit_mock, view):
     rect = QtCore.QRectF(30, 40, 100, 80)
     view.previous_transform = {'toggle_item': MagicMock()}
@@ -115,7 +115,7 @@ def test_fit_rect_no_toggle(fit_mock, view):
     assert view.previous_transform is None
 
 
-@patch('beeref.view.BeeGraphicsView.fitInView')
+@patch('dreamboard.view.DreambGraphicsView.fitInView')
 def test_fit_rect_toggle_when_no_previous(fit_mock, view):
     item = MagicMock()
     view.previous_transform = None
@@ -131,8 +131,8 @@ def test_fit_rect_toggle_when_no_previous(fit_mock, view):
     assert isinstance(view.previous_transform['center'], QtCore.QPointF)
 
 
-@patch('beeref.view.BeeGraphicsView.fitInView')
-@patch('beeref.view.BeeGraphicsView.centerOn')
+@patch('dreamboard.view.DreambGraphicsView.fitInView')
+@patch('dreamboard.view.DreambGraphicsView.centerOn')
 def test_fit_rect_toggle_when_previous(center_mock, fit_mock, view):
     item = MagicMock()
     view.previous_transform = {
@@ -148,10 +148,10 @@ def test_fit_rect_toggle_when_previous(center_mock, fit_mock, view):
     assert view.get_scale() == 2
 
 
-@patch('beeref.view.BeeGraphicsView.clear_scene')
+@patch('dreamboard.view.DreambGraphicsView.clear_scene')
 def test_open_from_file(clear_mock, view, qtbot):
     root = os.path.dirname(__file__)
-    filename = os.path.join(root, 'assets', 'test1item.bee')
+    filename = os.path.join(root, 'assets', 'test1item.dreamb')
     view.on_loading_finished = MagicMock()
     view.open_from_file(filename)
     view.worker.wait()
@@ -179,7 +179,7 @@ def test_on_action_open(dialog_mock, view, qtbot):
     # FIXME: #1
     # Can't check signal handling currently
     root = os.path.dirname(__file__)
-    filename = os.path.join(root, 'assets', 'test1item.bee')
+    filename = os.path.join(root, 'assets', 'test1item.dreamb')
     dialog_mock.return_value = (filename, None)
     view.on_loading_finished = MagicMock()
     view.scene.cancel_crop_mode = MagicMock()
@@ -195,7 +195,7 @@ def test_on_action_open(dialog_mock, view, qtbot):
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getOpenFileName')
-@patch('beeref.view.BeeGraphicsView.open_from_file')
+@patch('dreamboard.view.DreambGraphicsView.open_from_file')
 def test_on_action_open_when_no_filename(open_mock, dialog_mock, view):
     dialog_mock.return_value = (None, None)
     view.scene.cancel_crop_mode = MagicMock()
@@ -206,10 +206,10 @@ def test_on_action_open_when_no_filename(open_mock, dialog_mock, view):
 
 @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName')
 def test_on_action_save_as(dialog_mock, view, imgfilename3x3, tmpdir):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
-    filename = os.path.join(tmpdir, 'test.bee')
+    filename = os.path.join(tmpdir, 'test.dreamb')
     assert os.path.exists(filename) is False
     dialog_mock.return_value = (filename, None)
     view.on_action_save_as()
@@ -219,10 +219,10 @@ def test_on_action_save_as(dialog_mock, view, imgfilename3x3, tmpdir):
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName')
-@patch('beeref.view.BeeGraphicsView.do_save')
+@patch('dreamboard.view.DreambGraphicsView.do_save')
 def test_on_action_save_as_when_no_filename(
         save_mock, dialog_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     dialog_mock.return_value = (None, None)
@@ -232,9 +232,9 @@ def test_on_action_save_as_when_no_filename(
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName')
-def test_on_action_save_as_filename_doesnt_end_with_bee(
+def test_on_action_save_as_filename_doesnt_end_with_dreamb(
         dialog_mock, view, qtbot, imgfilename3x3, tmpdir):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     view.on_saving_finished = MagicMock()
@@ -243,20 +243,20 @@ def test_on_action_save_as_filename_doesnt_end_with_bee(
     dialog_mock.return_value = (filename, None)
     view.on_action_save_as()
     qtbot.waitUntil(lambda: view.on_saving_finished.called is True)
-    assert os.path.exists(f'{filename}.bee') is True
-    view.on_saving_finished.assert_called_once_with(f'{filename}.bee', [])
+    assert os.path.exists(f'{filename}.dreamb') is True
+    view.on_saving_finished.assert_called_once_with(f'{filename}.dreamb', [])
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName')
-@patch('beeref.fileio.sql.SQLiteIO.write_data')
+@patch('dreamboard.fileio.sql.SQLiteIO.write_data')
 def test_on_action_save_as_when_error(
         save_mock, dialog_mock, view, qtbot, imgfilename3x3, tmpdir):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.on_saving_finished = MagicMock()
     view.scene.cancel_crop_mode = MagicMock()
-    filename = os.path.join(tmpdir, 'test.bee')
+    filename = os.path.join(tmpdir, 'test.dreamb')
     dialog_mock.return_value = (filename, None)
     save_mock.side_effect = sqlite3.Error('foo')
     view.on_action_save_as()
@@ -266,12 +266,12 @@ def test_on_action_save_as_when_error(
 
 
 def test_on_action_save(view, qtbot, imgfilename3x3, tmpdir):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
-    view.filename = os.path.join(tmpdir, 'test.bee')
+    view.filename = os.path.join(tmpdir, 'test.dreamb')
     root = os.path.dirname(__file__)
-    shutil.copyfile(os.path.join(root, 'assets', 'test1item.bee'),
+    shutil.copyfile(os.path.join(root, 'assets', 'test1item.dreamb'),
                     view.filename)
     view.on_saving_finished = MagicMock()
     view.on_action_save()
@@ -281,9 +281,9 @@ def test_on_action_save(view, qtbot, imgfilename3x3, tmpdir):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.view.BeeGraphicsView.on_action_save_as')
+@patch('dreamboard.view.DreambGraphicsView.on_action_save_as')
 def test_on_action_save_when_no_filename(save_as_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     view.filename = None
@@ -292,13 +292,13 @@ def test_on_action_save_when_no_filename(save_as_mock, view, imgfilename3x3):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.widgets.HelpDialog.show')
+@patch('dreamboard.widgets.HelpDialog.show')
 def test_on_action_help(show_mock, view):
     view.on_action_help()
     show_mock.assert_called_once()
 
 
-@patch('beeref.widgets.DebugLogDialog.show')
+@patch('dreamboard.widgets.DebugLogDialog.show')
 def test_on_action_debuglog(show_mock, view):
     with patch('builtins.open', mock_open(read_data='log')) as open_mock:
         view.on_action_debuglog()
@@ -306,7 +306,7 @@ def test_on_action_debuglog(show_mock, view):
         open_mock.assert_called_once_with(logfile_name())
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtWidgets.QFileDialog.getOpenFileNames')
 def test_on_action_insert_images_new_scene(
         dialog_mock, clear_mock, view, imgfilename3x3, qtbot):
@@ -324,7 +324,7 @@ def test_on_action_insert_images_new_scene(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtWidgets.QFileDialog.getOpenFileNames')
 def test_on_action_insert_images_existing_scene(
         dialog_mock, clear_mock, view, imgfilename3x3, qtbot, item):
@@ -343,7 +343,7 @@ def test_on_action_insert_images_existing_scene(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtWidgets.QFileDialog.getOpenFileNames')
 def test_on_action_insert_images_when_error(
         dialog_mock, clear_mock, view, imgfilename3x3, qtbot):
@@ -362,7 +362,7 @@ def test_on_action_insert_images_when_error(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 def test_on_action_insert_text(clear_mock, view):
     view.scene.cancel_crop_mode = MagicMock()
     view.on_action_insert_text()
@@ -376,7 +376,7 @@ def test_on_action_insert_text(clear_mock, view):
 
 @patch('PyQt6.QtWidgets.QApplication.clipboard')
 def test_on_action_copy_image(clipboard_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     item.setSelected(True)
@@ -386,13 +386,13 @@ def test_on_action_copy_image(clipboard_mock, view, imgfilename3x3):
 
     clipboard_mock.return_value.setPixmap.assert_called_once()
     view.scene.internal_clipboard == [item]
-    assert mimedata.data('beeref/items') == b'1'
+    assert mimedata.data('dreamboard/items') == b'1'
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
 @patch('PyQt6.QtWidgets.QApplication.clipboard')
 def test_on_action_copy_text(clipboard_mock, view, imgfilename3x3):
-    item = BeeTextItem('foo bar')
+    item = DreambTextItem('foo bar')
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     item.setSelected(True)
@@ -402,12 +402,12 @@ def test_on_action_copy_text(clipboard_mock, view, imgfilename3x3):
 
     clipboard_mock.return_value.setText.assert_called_once_with('foo bar')
     view.scene.internal_clipboard == [item]
-    assert mimedata.data('beeref/items') == b'1'
+    assert mimedata.data('dreamboard/items') == b'1'
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.view.BeeGraphicsView.on_action_fit_scene')
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.view.DreambGraphicsView.on_action_fit_scene')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_external_new_scene(
         clipboard_mock, clear_mock, fit_mock, view, imgfilename3x3):
@@ -420,8 +420,8 @@ def test_on_action_paste_external_new_scene(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.view.BeeGraphicsView.on_action_fit_scene')
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.view.DreambGraphicsView.on_action_fit_scene')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_external_existing_scene(
         clipboard_mock, clear_mock, fit_mock, view, item, imgfilename3x3):
@@ -436,13 +436,13 @@ def test_on_action_paste_external_existing_scene(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.mimeData')
 def test_on_action_paste_internal(mimedata_mock, clear_mock, view):
     mimedata = QtCore.QMimeData()
-    mimedata.setData('beeref/items', QtCore.QByteArray.number(1))
+    mimedata.setData('dreamboard/items', QtCore.QByteArray.number(1))
     mimedata_mock.return_value = mimedata
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.internal_clipboard = [item]
     view.scene.cancel_crop_mode = MagicMock()
     view.on_action_paste()
@@ -452,7 +452,7 @@ def test_on_action_paste_internal(mimedata_mock, clear_mock, view):
     view.scene.cancel_crop_mode.assert_called()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.text')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_when_text(img_mock, text_mock, clear_mock, view):
@@ -467,7 +467,7 @@ def test_on_action_paste_when_text(img_mock, text_mock, clear_mock, view):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.scene.BeeGraphicsScene.clearSelection')
+@patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.text')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_when_empty(img_mock, text_mock, clear_mock, view):
@@ -480,7 +480,7 @@ def test_on_action_paste_when_empty(img_mock, text_mock, clear_mock, view):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('beeref.view.BeeGraphicsView.on_action_copy')
+@patch('dreamboard.view.DreambGraphicsView.on_action_copy')
 def test_on_action_cut(copy_mock, view, item):
     view.scene.addItem(item)
     item.setSelected(True)
@@ -560,32 +560,32 @@ def test_on_action_delete_items(view, item):
 def test_update_window_title_no_changes_no_filename(clear_mock, view):
     view.filename = None
     view.update_window_title()
-    assert view.parent.windowTitle() == 'BeeRef'
+    assert view.parent.windowTitle() == 'DreamBoard'
 
 
 @patch('PyQt6.QtGui.QUndoStack.isClean', return_value=False)
 def test_update_window_title_changes_no_filename(clear_mock, view):
     view.filename = None
     view.update_window_title()
-    assert view.parent.windowTitle() == '[Untitled]* - BeeRef'
+    assert view.parent.windowTitle() == '[Untitled]* - DreamBoard'
 
 
 @patch('PyQt6.QtGui.QUndoStack.isClean', return_value=True)
 def test_update_window_title_no_changes_filename(clear_mock, view):
-    view.filename = 'test.bee'
+    view.filename = 'test.dreamb'
     view.update_window_title()
-    assert view.parent.windowTitle() == 'test.bee - BeeRef'
+    assert view.parent.windowTitle() == 'test.dreamb - DreamBoard'
 
 
 @patch('PyQt6.QtGui.QUndoStack.isClean', return_value=False)
 def test_update_window_title_changes_filename(clear_mock, view):
-    view.filename = 'test.bee'
+    view.filename = 'test.dreamb'
     view.update_window_title()
-    assert view.parent.windowTitle() == 'test.bee* - BeeRef'
+    assert view.parent.windowTitle() == 'test.dreamb* - DreamBoard'
 
 
-@patch('beeref.view.BeeGraphicsView.recalc_scene_rect')
-@patch('beeref.scene.BeeGraphicsScene.on_view_scale_change')
+@patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect')
+@patch('dreamboard.scene.DreambGraphicsScene.on_view_scale_change')
 def test_scale(view_scale_mock, recalc_mock, view):
     view.scale(3.3, 3.3)
     view_scale_mock.assert_called_once_with()
@@ -606,10 +606,10 @@ def test_pan_when_no_items(scroll_value_mock, view):
     scroll_value_mock.assert_not_called()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_zoom_in(pan_mock, reset_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.zoom(40, QtCore.QPointF(10, 10))
     assert view.get_scale() == 1.04
@@ -617,10 +617,10 @@ def test_zoom_in(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_called_once()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_zoom_in_max_zoom_size(pan_mock, reset_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scale(10000000, 10000000)
     view.scene.addItem(item)
     view.zoom(40, QtCore.QPointF(10, 10))
@@ -629,10 +629,10 @@ def test_zoom_in_max_zoom_size(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_not_called()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_zoom_out(pan_mock, reset_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scale(100, 100)
     view.scene.addItem(item)
     view.zoom(-40, QtCore.QPointF(10, 10))
@@ -641,8 +641,8 @@ def test_zoom_out(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_called_once()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_zoom_out_min_zoom_size(pan_mock, reset_mock, view, item):
     view.scene.addItem(item)
     view.zoom(-40, QtCore.QPointF(10, 10))
@@ -651,8 +651,8 @@ def test_zoom_out_min_zoom_size(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_no_items(pan_mock, reset_mock, view, item):
     view.zoom(40, QtCore.QPointF(10, 10))
     assert view.get_scale() == 1
@@ -660,8 +660,8 @@ def test_no_items(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('beeref.view.BeeGraphicsView.reset_previous_transform')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_delta_zero(pan_mock, reset_mock, view, item):
     view.scene.addItem(item)
     view.zoom(0, QtCore.QPointF(10, 10))
@@ -670,7 +670,7 @@ def test_delta_zero(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('beeref.view.BeeGraphicsView.zoom')
+@patch('dreamboard.view.DreambGraphicsView.zoom')
 def test_wheel_event(zoom_mock, view):
     event = MagicMock()
     event.angleDelta.return_value = QtCore.QPointF(0, 40)
@@ -758,7 +758,7 @@ def test_mouse_press_unhandled(mouse_event_mock, view):
 
 
 @patch('PyQt6.QtWidgets.QGraphicsView.mouseMoveEvent')
-@patch('beeref.view.BeeGraphicsView.pan')
+@patch('dreamboard.view.DreambGraphicsView.pan')
 def test_mouse_move_pan(pan_mock, mouse_event_mock, view):
     view.pan_active = True
     view.event_start = QtCore.QPointF(55, 66)
@@ -771,7 +771,7 @@ def test_mouse_move_pan(pan_mock, mouse_event_mock, view):
 
 
 @patch('PyQt6.QtWidgets.QGraphicsView.mouseMoveEvent')
-@patch('beeref.view.BeeGraphicsView.zoom')
+@patch('dreamboard.view.DreambGraphicsView.zoom')
 def test_mouse_move_zoom(zoom_mock, mouse_event_mock, view):
     view.zoom_active = True
     view.event_anchor = QtCore.QPointF(55, 66)
@@ -883,7 +883,7 @@ def test_drag_move(view):
     event.acceptProposedAction.assert_called_once()
 
 
-@patch('beeref.view.BeeGraphicsView.do_insert_images')
+@patch('dreamboard.view.DreambGraphicsView.do_insert_images')
 def test_drop_when_url(insert_mock, view, imgfilename3x3):
     url = QtCore.QUrl.fromLocalFile(imgfilename3x3)
     mimedata = QtCore.QMimeData()
@@ -896,10 +896,10 @@ def test_drop_when_url(insert_mock, view, imgfilename3x3):
     insert_mock.assert_called_once_with([url], QtCore.QPoint(10, 20))
 
 
-@patch('beeref.view.BeeGraphicsView.open_from_file')
-def test_drop_when_url_beefile_and_scene_empty(open_mock, view):
+@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+def test_drop_when_url_dreambfile_and_scene_empty(open_mock, view):
     root = os.path.dirname(__file__)
-    filename = os.path.join(root, 'assets', 'test1item.bee')
+    filename = os.path.join(root, 'assets', 'test1item.dreamb')
     url = QtCore.QUrl.fromLocalFile(filename)
     mimedata = QtCore.QMimeData()
     mimedata.setUrls([url])
@@ -911,13 +911,13 @@ def test_drop_when_url_beefile_and_scene_empty(open_mock, view):
     open_mock.assert_called_once_with(filename)
 
 
-@patch('beeref.view.BeeGraphicsView.do_insert_images')
-@patch('beeref.view.BeeGraphicsView.open_from_file')
-def test_drop_when_url_beefile_and_scene_not_empty(
+@patch('dreamboard.view.DreambGraphicsView.do_insert_images')
+@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+def test_drop_when_url_dreambfile_and_scene_not_empty(
         open_mock, insert_mock, view, item):
     view.scene.addItem(item)
     root = os.path.dirname(__file__)
-    filename = os.path.join(root, 'assets', 'test1item.bee')
+    filename = os.path.join(root, 'assets', 'test1item.dreamb')
     url = QtCore.QUrl.fromLocalFile(filename)
     mimedata = QtCore.QMimeData()
     mimedata.setUrls([url])

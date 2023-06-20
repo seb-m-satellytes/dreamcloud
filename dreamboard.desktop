@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=DreamBoard
+Comment=DreamBoard
+Terminal=false
+Exec=/home/yourname/path/to/DreamBoard
+Type=Application
+Icon=/home/yourname/path/to/logo.png
+Name[en_US]=DreamBoard
+
+MimeType=application/x-dreamboard;
+Categories=Qt;KDE;Graphics;
+X-KDE-NativeMimeType=application/x-dreamboard
+X-KDE-ExtraNativeMimeTypes=

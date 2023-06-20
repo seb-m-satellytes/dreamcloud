@@ -5,13 +5,13 @@ from unittest.mock import patch, MagicMock
 from PyQt6 import QtCore, QtGui
 from PyQt6.QtCore import Qt
 
-from beeref.assets import BeeAssets
-from beeref import commands
-from beeref.items import BeePixmapItem
+from dreamboard.assets import DreambAssets
+from dreamboard import commands
+from dreamboard.items import DreambPixmapItem
 
 
 def test_init_selectable(view):
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     assert item.viewport_scale == 1
     assert item.scale_active is False
     assert item.rotate_active is False
@@ -28,7 +28,7 @@ def test_is_action_active_when_action(view, item):
 
 
 def test_on_view_scale_change(view, item):
-    with patch('beeref.items.BeePixmapItem.prepareGeometryChange') as m:
+    with patch('dreamboard.items.DreambPixmapItem.prepareGeometryChange') as m:
         item.on_view_scale_change()
         m.assert_called_once()
 
@@ -108,7 +108,7 @@ def test_draw_debug_shape_path(view, item):
     painter.fillRect.assert_not_called()
 
 
-@patch('beeref.items.BeePixmapItem.draw_debug_shape')
+@patch('dreamboard.items.DreambPixmapItem.draw_debug_shape')
 def test_paint_when_not_selected(debug_mock, view, item):
     view.scene.addItem(item)
     painter = MagicMock()
@@ -132,7 +132,7 @@ def test_paint_when_selected_single_selection(view, item):
 
 def test_paint_when_selected_multi_selection(view, item):
     view.scene.addItem(item)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     item2.setSelected(True)
     view.scene.addItem(item2)
     painter = MagicMock()
@@ -144,34 +144,34 @@ def test_paint_when_selected_multi_selection(view, item):
 
 
 def test_paint_when_debug_shapes(view):
-    with patch('beeref.selection.commandline_args') as args_mock:
-        with patch('beeref.items.BeePixmapItem.draw_debug_shape') as m:
+    with patch('dreamboard.selection.commandline_args') as args_mock:
+        with patch('dreamboard.items.DreambPixmapItem.draw_debug_shape') as m:
             args_mock.debug_shapes = True
             args_mock.debug_boundingrects = False
             args_mock.debug_handles = False
-            item = BeePixmapItem(QtGui.QImage())
+            item = DreambPixmapItem(QtGui.QImage())
             item.paint(MagicMock(), None, None)
             m.assert_called_once()
 
 
 def test_paint_when_debug_boundingrects(view):
-    with patch('beeref.selection.commandline_args') as args_mock:
-        with patch('beeref.items.BeePixmapItem.draw_debug_shape') as m:
+    with patch('dreamboard.selection.commandline_args') as args_mock:
+        with patch('dreamboard.items.DreambPixmapItem.draw_debug_shape') as m:
             args_mock.debug_shapes = False
             args_mock.debug_boundingrects = True
             args_mock.debug_handles = False
-            item = BeePixmapItem(QtGui.QImage())
+            item = DreambPixmapItem(QtGui.QImage())
             item.paint(MagicMock(), None, None)
             m.assert_called_once()
 
 
 def test_paint_when_debug_handles(view):
-    with patch('beeref.selection.commandline_args') as args_mock:
-        with patch('beeref.items.BeePixmapItem.draw_debug_shape') as m:
+    with patch('dreamboard.selection.commandline_args') as args_mock:
+        with patch('dreamboard.items.DreambPixmapItem.draw_debug_shape') as m:
             args_mock.debug_shapes = False
             args_mock.debug_boundingrects = False
             args_mock.debug_handles = True
-            item = BeePixmapItem(QtGui.QImage())
+            item = DreambPixmapItem(QtGui.QImage())
             view.scene.addItem(item)
             item.setSelected(True)
             item.paint(MagicMock(), None, None)
@@ -349,7 +349,7 @@ def test_shape_when_selected_single(view, item):
 
 def test_shape_when_selected_multi(view, item):
     view.scene.addItem(item)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item.SELECT_RESIZE_SIZE = 10
@@ -679,7 +679,7 @@ def test_hover_move_event_rotate(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_rotate
+        assert item.cursor() == DreambAssets().cursor_rotate
 
 
 def test_hover_flip_event_top_edge(view, item):
@@ -690,7 +690,7 @@ def test_hover_flip_event_top_edge(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_v
+        assert item.cursor() == DreambAssets().cursor_flip_v
 
 
 def test_hover_flip_event_bottom_edge(view, item):
@@ -701,7 +701,7 @@ def test_hover_flip_event_bottom_edge(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_v
+        assert item.cursor() == DreambAssets().cursor_flip_v
 
 
 def test_hover_flip_event_left_edge(view, item):
@@ -712,7 +712,7 @@ def test_hover_flip_event_left_edge(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_h
+        assert item.cursor() == DreambAssets().cursor_flip_h
 
 
 def test_hover_flip_event_right_edge(view, item):
@@ -723,7 +723,7 @@ def test_hover_flip_event_right_edge(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_h
+        assert item.cursor() == DreambAssets().cursor_flip_h
 
 
 def test_hover_flip_event_top_edge_rotated_90(view, item):
@@ -735,7 +735,7 @@ def test_hover_flip_event_top_edge_rotated_90(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_h
+        assert item.cursor() == DreambAssets().cursor_flip_h
 
 
 def test_hover_flip_event_left_edge_when_rotated_90(view, item):
@@ -747,7 +747,7 @@ def test_hover_flip_event_left_edge_when_rotated_90(view, item):
     with patch.object(item, 'bounding_rect_unselected',
                       return_value=QtCore.QRectF(0, 0, 100, 80)):
         item.hoverMoveEvent(event)
-        assert item.cursor() == BeeAssets().cursor_flip_v
+        assert item.cursor() == DreambAssets().cursor_flip_v
 
 
 def test_hover_move_event_not_in_handles(view, item):

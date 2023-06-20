@@ -6,8 +6,8 @@ from pytest import approx
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from beeref import commands
-from beeref.items import BeePixmapItem, BeeTextItem
+from dreamboard import commands
+from dreamboard.items import DreambPixmapItem, DreambTextItem
 
 
 def test_add_remove_item(view, item):
@@ -29,13 +29,13 @@ def test_cancel_crop_mode_when_no_crop(view, item):
 
 
 def test_copy_selection_to_internal_clipboard(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
-    item3 = BeePixmapItem(QtGui.QImage())
+    item3 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item3)
 
     view.scene.copy_selection_to_internal_clipboard()
@@ -44,10 +44,10 @@ def test_copy_selection_to_internal_clipboard(view):
 
 
 def test_paste_from_internal_clipboard(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     item2.setScale(3.3)
     view.scene.internal_clipboard = [item2]
 
@@ -60,15 +60,15 @@ def test_paste_from_internal_clipboard(view):
 
 
 def test_raise_to_top(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setZValue(0.06)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setZValue(0.02)
-    item3 = BeePixmapItem(QtGui.QImage())
+    item3 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item3)
     item3.setZValue(0.07)
     view.scene.cancel_crop_mode = MagicMock()
@@ -81,15 +81,15 @@ def test_raise_to_top(view):
 
 
 def test_lower_to_bottom(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setZValue(-0.06)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setZValue(-0.02)
-    item3 = BeePixmapItem(QtGui.QImage())
+    item3 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item3)
     item3.setZValue(-0.07)
     view.scene.cancel_crop_mode = MagicMock()
@@ -102,10 +102,10 @@ def test_lower_to_bottom(view):
 
 
 def test_normalize_height(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setScale(3)
@@ -125,10 +125,10 @@ def test_normalize_height(view):
 
 
 def test_normalize_height_with_rotation(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setRotation(90)
@@ -152,10 +152,10 @@ def test_normalize_height_when_no_items(view):
 
 
 def test_normalize_width(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setScale(3)
@@ -175,10 +175,10 @@ def test_normalize_width(view):
 
 
 def test_normalize_width_with_rotation(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setRotation(90)
@@ -202,10 +202,10 @@ def test_normalize_width_when_no_items(view):
 
 
 def test_normalize_size(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setScale(2)
@@ -223,10 +223,10 @@ def test_normalize_size(view):
 
 
 def test_normalize_size_with_rotation(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setRotation(90)
@@ -250,11 +250,11 @@ def test_normalize_size_when_no_items(view):
 
 
 def test_arrange_horizontal(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setPos(10, -100)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setPos(-10, 40)
@@ -272,11 +272,11 @@ def test_arrange_horizontal(view):
 
 
 def test_arrange_vertical(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setPos(10, -100)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setPos(-10, 40)
@@ -294,12 +294,12 @@ def test_arrange_vertical(view):
 
 
 def test_arrange_when_rotated(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setPos(10, -100)
     item1.setRotation(90)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setPos(-10, 40)
@@ -325,7 +325,7 @@ def test_arrange_when_no_items(view):
 
 def test_arrange_optimal(view):
     for i in range(4):
-        item = BeePixmapItem(QtGui.QImage())
+        item = DreambPixmapItem(QtGui.QImage())
         view.scene.addItem(item)
         item.setSelected(True)
         item.crop = QtCore.QRectF(0, 0, 100, 80)
@@ -342,7 +342,7 @@ def test_arrange_optimal(view):
 
 def test_arrange_optimal_when_rotated(view):
     for i in range(4):
-        item = BeePixmapItem(QtGui.QImage())
+        item = DreambPixmapItem(QtGui.QImage())
         view.scene.addItem(item)
         item.setRotation(90)
         item.setSelected(True)
@@ -370,7 +370,7 @@ def test_flip_items(view, item):
     item.setSelected(True)
     view.scene.undo_stack = MagicMock(push=MagicMock())
     view.scene.cancel_crop_mode = MagicMock()
-    with patch('beeref.scene.BeeGraphicsScene.itemsBoundingRect',
+    with patch('dreamboard.scene.DreambGraphicsScene.itemsBoundingRect',
                return_value=QtCore.QRectF(10, 20, 100, 60)):
         view.scene.flip_items(vertical=True)
         args = view.scene.undo_stack.push.call_args_list[0][0]
@@ -405,7 +405,7 @@ def test_crop_item_multi_select(view, item):
     view.scene.addItem(item)
     item.setSelected(True)
     item.enter_crop_mode = MagicMock()
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
 
@@ -423,7 +423,7 @@ def test_crop_item_no_selection(view, item):
 
 
 def test_crop_item_when_not_croppable(view):
-    item = BeeTextItem('foo')
+    item = DreambTextItem('foo')
     item.setSelected(True)
     item.enter_crop_mode = MagicMock()
 
@@ -432,10 +432,10 @@ def test_crop_item_when_not_croppable(view):
 
 
 def test_set_selected_all_items_when_true(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     view.scene.cancel_crop_mode = MagicMock()
@@ -447,10 +447,10 @@ def test_set_selected_all_items_when_true(view):
 
 
 def test_set_selected_all_items_when_false(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     view.scene.cancel_crop_mode = MagicMock()
@@ -478,19 +478,19 @@ def test_has_single_selection_when_no_selection(view, item):
 
 
 def test_has_single_selection_when_single_selection(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     assert view.scene.has_single_selection() is True
 
 
 def test_has_single_selection_when_multi_selection(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     assert view.scene.has_single_selection() is False
@@ -502,19 +502,19 @@ def test_has_multi_selection_when_no_selection(view, item):
 
 
 def test_has_multi_selection_when_single_selection(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     assert view.scene.has_multi_selection() is False
 
 
 def test_has_multi_selection_when_multi_selection(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     assert view.scene.has_multi_selection() is True
@@ -527,7 +527,7 @@ def test_has_croppable_selection(view, item):
 
 
 def test_has_croppable_selection_when_item_not_croppable(view):
-    item = BeeTextItem('foo')
+    item = DreambTextItem('foo')
     view.scene.addItem(item)
     item.setSelected(True)
     assert view.scene.has_croppable_selection() is False
@@ -542,7 +542,7 @@ def test_has_croppable_selection_when_no_selection(view, item):
 def test_has_croppable_selection_when_multi_selection(view, item):
     view.scene.addItem(item)
     item.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     assert view.scene.has_croppable_selection() is False
@@ -575,7 +575,7 @@ def test_mouse_press_event_when_left_click_over_item(mouse_mock, view, item):
 @patch('PyQt6.QtWidgets.QGraphicsScene.mousePressEvent')
 def test_mouse_press_event_when_left_click_over_item_in_edit_mode(
         mouse_mock, view):
-    item = BeeTextItem('foo bar')
+    item = DreambTextItem('foo bar')
     item.exit_edit_mode = MagicMock()
     view.scene.addItem(item)
     view.scene.edit_item = item
@@ -594,7 +594,7 @@ def test_mouse_press_event_when_left_click_over_item_in_edit_mode(
 @patch('PyQt6.QtWidgets.QGraphicsScene.mousePressEvent')
 def test_mouse_press_event_when_left_click_over_diff_item_in_edit_mode(
         mouse_mock, view, item):
-    txtitem = BeeTextItem('foo bar')
+    txtitem = DreambTextItem('foo bar')
     txtitem.exit_edit_mode = MagicMock()
     view.scene.addItem(txtitem)
     view.scene.edit_item = txtitem
@@ -613,7 +613,7 @@ def test_mouse_press_event_when_left_click_over_diff_item_in_edit_mode(
 @patch('PyQt6.QtWidgets.QGraphicsScene.mousePressEvent')
 def test_mouse_press_event_when_left_click_over_no_item_in_edit_mode(
         mouse_mock, view):
-    item = BeeTextItem('foo bar')
+    item = DreambTextItem('foo bar')
     item.exit_edit_mode = MagicMock()
     view.scene.addItem(item)
     view.scene.edit_item = item
@@ -653,7 +653,7 @@ def test_mouse_press_event_when_left_click_over_diff_item_in_crop_mode(
     view.scene.addItem(item)
     view.scene.cancel_crop_mode = MagicMock()
     view.scene.crop_item = item
-    other_item = BeePixmapItem(QtGui.QImage())
+    other_item = DreambPixmapItem(QtGui.QImage())
     view.scene.itemAt = MagicMock(return_value=other_item)
     event = MagicMock(
         button=MagicMock(return_value=Qt.MouseButton.LeftButton),
@@ -740,7 +740,7 @@ def test_mouse_doubleclick_event_when_over_item(mouse_mock, view, item):
 @patch('PyQt6.QtWidgets.QGraphicsScene.mouseDoubleClickEvent')
 def test_mouse_doubleclick_event_when_over_editable_item(
         double_mock, press_mock, view):
-    item = BeeTextItem('foo bar')
+    item = DreambTextItem('foo bar')
     item.enter_edit_mode = MagicMock()
     event = MagicMock()
     view.scene.move_active = True
@@ -795,7 +795,7 @@ def test_mouse_doubleclick_event_when_not_over_item(mouse_mock, view):
 @patch('PyQt6.QtWidgets.QGraphicsScene.mouseMoveEvent')
 def test_mouse_move_event_when_rubberband_new(
         mouse_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.rubberband_active = True
     view.scene.addItem = MagicMock()
@@ -819,7 +819,7 @@ def test_mouse_move_event_when_rubberband_new(
 @patch('PyQt6.QtWidgets.QGraphicsScene.mouseMoveEvent')
 def test_mouse_move_event_when_rubberband_not_new(
         mouse_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.rubberband_active = True
     view.scene.event_start = QtCore.QPointF(0, 0)
@@ -842,7 +842,7 @@ def test_mouse_move_event_when_rubberband_not_new(
 
 @patch('PyQt6.QtWidgets.QGraphicsScene.mouseMoveEvent')
 def test_mouse_move_event_when_no_rubberband(mouse_mock, view, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
     view.scene.rubberband_active = False
     view.scene.event_start = QtCore.QPointF(0, 0)
@@ -941,10 +941,10 @@ def test_mouse_release_event_when_item_action_active(mouse_mock, view, item):
 
 @patch('PyQt6.QtWidgets.QGraphicsScene.mouseReleaseEvent')
 def test_mouse_release_event_when_multiselect_action_active(mouse_mock, view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     event = MagicMock(scenePos=MagicMock(return_value=QtCore.QPoint(10, 20)))
@@ -959,10 +959,10 @@ def test_mouse_release_event_when_multiselect_action_active(mouse_mock, view):
 
 
 def test_selected_items(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     selected = view.scene.selectedItems()
@@ -972,10 +972,10 @@ def test_selected_items(view):
 
 
 def test_selected_items_user_only(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     selected = view.scene.selectedItems(user_only=True)
@@ -985,9 +985,9 @@ def test_selected_items_user_only(view):
 
 
 def test_items_for_save(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item3 = QtWidgets.QGraphicsRectItem()
     view.scene.addItem(item3)
@@ -997,10 +997,10 @@ def test_items_for_save(view):
 
 
 def test_clear_save_ids(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     item1.save_id = 5
     view.scene.addItem(item1)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item3 = QtWidgets.QGraphicsRectItem()
     view.scene.addItem(item3)
@@ -1020,15 +1020,15 @@ def test_on_view_scale_change(view, item):
 
 
 def test_items_bounding_rect_given_items(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setPos(4, -6)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setPos(-33, 22)
-    item3 = BeePixmapItem(QtGui.QImage())
+    item3 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item3)
     item3.setSelected(True)
     item3.setPos(1000, 1000)
@@ -1046,15 +1046,15 @@ def test_items_bounding_rect_given_items(view):
 
 
 def test_items_bounding_rect_two_items_selection_only(view):
-    item1 = BeePixmapItem(QtGui.QImage())
+    item1 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item1)
     item1.setSelected(True)
     item1.setPos(4, -6)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item2.setPos(-33, 22)
-    item3 = BeePixmapItem(QtGui.QImage())
+    item3 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item3)
     item3.setSelected(False)
     item3.setPos(1000, 1000)
@@ -1086,7 +1086,7 @@ def test_items_bounding_rect_rotated_item(view, item):
 
 
 def test_items_bounding_rect_flipped_item(view):
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
     item.do_flip()
     with patch.object(item, 'bounding_rect_unselected',
@@ -1105,7 +1105,7 @@ def test_items_bounding_rect_when_no_items(view):
 
 
 def test_get_selection_center(view):
-    with patch('beeref.scene.BeeGraphicsScene.itemsBoundingRect',
+    with patch('dreamboard.scene.DreambGraphicsScene.itemsBoundingRect',
                return_value=QtCore.QRectF(10, 20, 100, 60)):
         center = view.scene.get_selection_center()
         assert center == QtCore.QPointF(60, 50)

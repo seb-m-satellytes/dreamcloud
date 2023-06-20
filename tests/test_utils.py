@@ -2,7 +2,7 @@ import pytest
 
 from PyQt6 import QtCore, QtGui
 
-from beeref import utils
+from dreamboard import utils
 
 
 def test_create_palette_from_dict_sets_qt_group():

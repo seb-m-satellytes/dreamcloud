@@ -4,24 +4,24 @@ from unittest.mock import MagicMock, patch
 
 from PyQt6 import QtCore
 
-from beeref import fileio
-from beeref import commands
+from dreamboard import fileio
+from dreamboard import commands
 from ..utils import queue2list
 
 
-@patch('beeref.fileio.sql.SQLiteIO.write')
-def test_save_bee_create_new_false(write_mock):
+@patch('dreamboard.fileio.sql.SQLiteIO.write')
+def test_save_dreamb_create_new_false(write_mock):
     with tempfile.TemporaryDirectory() as dirname:
-        fname = os.path.join(dirname, 'test.bee')
-        fileio.save_bee(fname, 'myscene', create_new=False)
+        fname = os.path.join(dirname, 'test.dreamb')
+        fileio.save_dreamb(fname, 'myscene', create_new=False)
         write_mock.assert_called_once()
 
 
-@patch('beeref.fileio.sql.SQLiteIO.read')
-def test_read_bee(read_mock):
+@patch('dreamboard.fileio.sql.SQLiteIO.read')
+def test_read_dreamb(read_mock):
     with tempfile.TemporaryDirectory() as dirname:
-        fname = os.path.join(dirname, 'test.bee')
-        fileio.load_bee(fname, 'myscene')
+        fname = os.path.join(dirname, 'test.dreamb')
+        fileio.load_dreamb(fname, 'myscene')
         read_mock.assert_called_once()
 
 

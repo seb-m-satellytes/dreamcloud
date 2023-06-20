@@ -4,16 +4,16 @@ from unittest.mock import patch, MagicMock
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from beeref.items import BeePixmapItem, item_registry
+from dreamboard.items import DreambPixmapItem, item_registry
 
 
 def test_in_item_registry():
-    assert item_registry['pixmap'] == BeePixmapItem
+    assert item_registry['pixmap'] == DreambPixmapItem
 
 
-@patch('beeref.selection.SelectableMixin.init_selectable')
+@patch('dreamboard.selection.SelectableMixin.init_selectable')
 def test_init(selectable_mock, qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3), imgfilename3x3)
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3), imgfilename3x3)
     assert item.save_id is None
     assert item.width == 3
     assert item.height == 3
@@ -60,13 +60,13 @@ def test_set_crop(qapp, item):
 
 
 def test_bounding_rect_unselected(qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     item.crop = QtCore.QRectF(1, 1, 2, 2)
     assert item.bounding_rect_unselected() == QtCore.QRectF(1, 1, 2, 2)
 
 
 def test_bounding_rect_unselected_in_crop_mode(qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     item.crop = QtCore.QRectF(1, 1, 2, 2)
     item.crop_mode = True
     assert item.bounding_rect_unselected() == QtCore.QRectF(-0.5, -0.5, 4, 4)
@@ -82,7 +82,7 @@ def test_get_extra_save_data(item):
 
 
 def test_pixmap_to_bytes(qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     assert item.pixmap_to_bytes().startswith(b'\x89PNG')
 
 
@@ -110,7 +110,7 @@ def test_has_selection_outline_when_selected(view, item):
 def test_has_selection_handles_when_not_selected(view, item):
     view.scene.addItem(item)
     item.setSelected(False)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(False)
     item.has_selection_handles() is False
@@ -119,7 +119,7 @@ def test_has_selection_handles_when_not_selected(view, item):
 def test_has_selection_handles_when_selected_single(view, item):
     view.scene.addItem(item)
     item.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(False)
     item.has_selection_handles() is True
@@ -128,14 +128,14 @@ def test_has_selection_handles_when_selected_single(view, item):
 def test_has_selection_handles_when_selected_multi(view, item):
     view.scene.addItem(item)
     item.setSelected(True)
-    item2 = BeePixmapItem(QtGui.QImage())
+    item2 = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item2)
     item2.setSelected(True)
     item.has_selection_handles() is False
 
 
 def test_selection_action_items(qapp):
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     assert item.selection_action_items() == [item]
 
 
@@ -169,14 +169,14 @@ def test_update_from_data_keeps_unset_values(item):
 
 
 def test_create_from_data(item):
-    new_item = BeePixmapItem.create_from_data(
+    new_item = DreambPixmapItem.create_from_data(
         item=item, data={'filename': 'foobar.png'})
     assert new_item is item
     assert item.filename == 'foobar.png'
 
 
 def test_create_from_data_with_crop(item):
-    new_item = BeePixmapItem.create_from_data(
+    new_item = DreambPixmapItem.create_from_data(
         item=item, data={'filename': 'foobar.png', 'crop': [10, 20, 30, 40]})
     assert new_item is item
     assert item.filename == 'foobar.png'
@@ -184,7 +184,7 @@ def test_create_from_data_with_crop(item):
 
 
 def test_create_copy(qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3), 'foo.png')
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3), 'foo.png')
     item.setPos(20, 30)
     item.setRotation(33)
     item.do_flip()
@@ -205,13 +205,13 @@ def test_create_copy(qapp, imgfilename3x3):
 
 def test_copy_to_clipboard(qapp, imgfilename3x3):
     clipboard = QtWidgets.QApplication.clipboard()
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3), 'foo.png')
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3), 'foo.png')
     item.copy_to_clipboard(clipboard)
     assert clipboard.pixmap().size() == item.pixmap().size()
 
 
 def test_reset_crop(qapp, imgfilename3x3):
-    item = BeePixmapItem(QtGui.QImage(imgfilename3x3))
+    item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     item.crop = QtCore.QRectF(10, 20, 30, 40)
     item.reset_crop()
     assert item.crop == QtCore.QRectF(0, 0, 3, 3)
@@ -392,7 +392,7 @@ def test_key_press_event_other(key_mock, qapp, item):
     key_mock.assert_called_once_with(event)
 
 
-@patch('beeref.selection.SelectableMixin.hoverMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.hoverMoveEvent')
 def test_hover_move_event_when_not_crop_mode(hover_mock, qapp, item):
     item.crop_mode = False
     event = MagicMock()
@@ -401,7 +401,7 @@ def test_hover_move_event_when_not_crop_mode(hover_mock, qapp, item):
     hover_mock.assert_called_once_with(event)
 
 
-@patch('beeref.selection.SelectableMixin.hoverMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.hoverMoveEvent')
 def test_hover_move_event_crop_mode_inside_handle(hover_mock, qapp, item):
     item.crop_mode = True
     item.crop_temp = QtCore.QRectF(0, 0, 100, 80)
@@ -413,7 +413,7 @@ def test_hover_move_event_crop_mode_inside_handle(hover_mock, qapp, item):
     hover_mock.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.hoverMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.hoverMoveEvent')
 def test_hover_move_event_crop_mode_inside_edge(hover_mock, qapp, item):
     item.crop_mode = True
     item.crop_temp = QtCore.QRectF(0, 0, 100, 80)
@@ -425,7 +425,7 @@ def test_hover_move_event_crop_mode_inside_edge(hover_mock, qapp, item):
     hover_mock.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.hoverMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.hoverMoveEvent')
 def test_hover_move_event_crop_mode_outside_handle(hover_mock, qapp, item):
     item.crop_mode = True
     item.crop_temp = QtCore.QRectF(0, 0, 100, 80)
@@ -438,7 +438,7 @@ def test_hover_move_event_crop_mode_outside_handle(hover_mock, qapp, item):
     hover_mock.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.mousePressEvent')
+@patch('dreamboard.selection.SelectableMixin.mousePressEvent')
 def test_mouse_press_event_when_not_crop_mode(mouse_mock, qapp, item):
     item.crop_mode = False
     item.crop_mode_move = None
@@ -452,7 +452,7 @@ def test_mouse_press_event_when_not_crop_mode(mouse_mock, qapp, item):
     event.accept.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.mousePressEvent')
+@patch('dreamboard.selection.SelectableMixin.mousePressEvent')
 def test_mouse_press_event_crop_mode_inside_handle(mouse_mock, qapp, item):
     item.crop_mode = True
     item.crop_temp = QtCore.QRectF(0, 0, 100, 80)
@@ -469,7 +469,7 @@ def test_mouse_press_event_crop_mode_inside_handle(mouse_mock, qapp, item):
     event.accept.assert_called_once_with()
 
 
-@patch('beeref.selection.SelectableMixin.mousePressEvent')
+@patch('dreamboard.selection.SelectableMixin.mousePressEvent')
 def test_mouse_press_event_crop_mode_inside_edge(mouse_mock, qapp, item):
     item.crop_mode = True
     item.crop_temp = QtCore.QRectF(0, 0, 100, 80)
@@ -486,7 +486,7 @@ def test_mouse_press_event_crop_mode_inside_edge(mouse_mock, qapp, item):
     event.accept.assert_called_once_with()
 
 
-@patch('beeref.selection.SelectableMixin.mousePressEvent')
+@patch('dreamboard.selection.SelectableMixin.mousePressEvent')
 def test_mouse_press_event_crop_mode_outside_handle_inside_crop(
         mouse_mock, qapp, item):
     item.crop_mode = True
@@ -503,7 +503,7 @@ def test_mouse_press_event_crop_mode_outside_handle_inside_crop(
     event.accept.assert_called_once_with()
 
 
-@patch('beeref.selection.SelectableMixin.mousePressEvent')
+@patch('dreamboard.selection.SelectableMixin.mousePressEvent')
 def test_mouse_press_event_crop_mode_outside_handle_outside_crop(
         mouse_mock, qapp, item):
     item.crop_mode = True
@@ -544,7 +544,7 @@ def test_ensure_point_within_pixmap_bounds_inside(point, expected, qapp, item):
      [(10, 40), (5, 35), 'crop_edge_left', (5, 20, 35, 40)],
      [(35, 25), (30, 20), 'crop_edge_bottom', (10, 20, 30, 35)],
      [(40, 40), (35, 35), 'crop_edge_right', (10, 20, 25, 40)]])
-@patch('beeref.selection.SelectableMixin.mouseMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.mouseMoveEvent')
 def test_mouse_move_when_crop_mode_inside_handle(
         mouse_mock, start, pos, handle, expected, qapp, item):
     pixmap = MagicMock()
@@ -563,7 +563,7 @@ def test_mouse_move_when_crop_mode_inside_handle(
     mouse_mock.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.mouseMoveEvent')
+@patch('dreamboard.selection.SelectableMixin.mouseMoveEvent')
 def test_mouse_move_when_not_crop_mode(mouse_mock, qapp, item):
     event = MagicMock()
     event.pos.return_value = QtCore.QPointF(30, 50)
@@ -573,7 +573,7 @@ def test_mouse_move_when_not_crop_mode(mouse_mock, qapp, item):
     mouse_mock.assert_called_once_with(event)
 
 
-@patch('beeref.selection.SelectableMixin.mouseReleaseEvent')
+@patch('dreamboard.selection.SelectableMixin.mouseReleaseEvent')
 def test_mouse_release_event_when_crop_mode(mouse_mock, qapp, item):
     event = MagicMock()
     item.crop_mode = True
@@ -588,7 +588,7 @@ def test_mouse_release_event_when_crop_mode(mouse_mock, qapp, item):
     mouse_mock.assert_not_called()
 
 
-@patch('beeref.selection.SelectableMixin.mouseReleaseEvent')
+@patch('dreamboard.selection.SelectableMixin.mouseReleaseEvent')
 def test_mouse_release_event_when_not_crop_mode(mouse_mock, qapp, item):
     event = MagicMock()
     item.crop_mode = False

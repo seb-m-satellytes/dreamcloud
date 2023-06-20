@@ -26,4 +26,4 @@ jobs:
       - name: Run tests with pytest
         run: >
           xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" 
-          pdm run coverage run --source=beeref -m pytest tests
+          pdm run coverage run --source=dreamboard -m pytest tests

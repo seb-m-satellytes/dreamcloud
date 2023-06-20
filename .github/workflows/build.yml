@@ -53,14 +53,14 @@ jobs:
           pdm install
 
       - name: Run Pyinstaller
-        run: pdm run pyinstaller BeeRef.spec
+        run: pdm run pyinstaller DreamBoard.spec
 
       - name: Compress artifact
         shell: bash
         env:
-          ARTIFACT_PATH: dist/BeeRef-${{ github.ref_name }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
+          ARTIFACT_PATH: dist/DreamBoard-${{ github.ref_name }}-${{ runner.os }}-${{ matrix.arch }}.tar.gz
         run: |
-          APPLICATION_FILE="BeeRef"
+          APPLICATION_FILE="DreamBoard"
 
           if [ "$RUNNER_OS" == "Linux" ]; then
             APPLICATION_FILE="$APPLICATION_FILE"

@@ -8,7 +8,7 @@ from PyQt6 import QtGui, QtWidgets
 
 
 def pytest_configure(config):
-    # Ignore logging configuration for BeeRef during test runs. This
+    # Ignore logging configuration for DreamBoard during test runs. This
     # avoids logging to the regular log file and spamming test output
     # with debug messages.
     #
@@ -18,13 +18,13 @@ def pytest_configure(config):
     logging.config.dictConfig = MagicMock
 
     # Disable creation of KeyboardSettings.ini to speed tests up
-    from beeref.config import KeyboardSettings
+    from dreamboard.config import KeyboardSettings
     KeyboardSettings.save_unknown_shortcuts = False
 
 
 @pytest.fixture(autouse=True)
 def commandline_args():
-    config_patcher = patch('beeref.view.commandline_args')
+    config_patcher = patch('dreamboard.view.commandline_args')
     config_mock = config_patcher.start()
     config_mock.filename = None
     yield config_mock
@@ -33,11 +33,11 @@ def commandline_args():
 
 @pytest.fixture(autouse=True)
 def settings(tmpdir):
-    from beeref.config import BeeSettings
-    dir_patcher = patch('beeref.config.BeeSettings.get_settings_dir',
+    from dreamboard.config import DreambSettings
+    dir_patcher = patch('dreamboard.config.DreambSettings.get_settings_dir',
                         return_value=tmpdir.dirname)
     dir_patcher.start()
-    settings = BeeSettings()
+    settings = DreambSettings()
     yield settings
     settings.clear()
     dir_patcher.stop()
@@ -45,8 +45,8 @@ def settings(tmpdir):
 
 @pytest.fixture(autouse=True)
 def kbsettings(tmpdir):
-    from beeref.config import KeyboardSettings
-    dir_patcher = patch('beeref.config.BeeSettings.get_settings_dir',
+    from dreamboard.config import KeyboardSettings
+    dir_patcher = patch('dreamboard.config.DreambSettings.get_settings_dir',
                         return_value=tmpdir.dirname)
     dir_patcher.start()
     kbsettings = KeyboardSettings()
@@ -57,9 +57,9 @@ def kbsettings(tmpdir):
 
 @pytest.fixture
 def main_window(qtbot):
-    from beeref.__main__ import BeeRefMainWindow
+    from dreamboard.__main__ import DreamBoardMainWindow
     app = QtWidgets.QApplication.instance()
-    main = BeeRefMainWindow(app)
+    main = DreamBoardMainWindow(app)
     qtbot.addWidget(main)
     yield main
 
@@ -89,11 +89,11 @@ def tmpfile(tmpdir):
 
 @pytest.fixture
 def item():
-    from beeref.items import BeePixmapItem
-    yield BeePixmapItem(QtGui.QImage())
+    from dreamboard.items import DreambPixmapItem
+    yield DreambPixmapItem(QtGui.QImage())
 
 
 @pytest.fixture(scope="session")
 def qapp():
-    from beeref.__main__ import BeeRefApplication
-    yield BeeRefApplication([])
+    from dreamboard.__main__ import DreamBoardApplication
+    yield DreamBoardApplication([])

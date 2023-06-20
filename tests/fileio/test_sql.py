@@ -7,18 +7,18 @@ from unittest.mock import MagicMock, patch
 from PyQt6 import QtCore, QtGui
 import pytest
 
-from beeref.fileio import schema, is_bee_file
-from beeref.fileio.errors import BeeFileIOError
-from beeref.fileio.sql import SQLiteIO
-from beeref.items import BeePixmapItem, BeeTextItem
+from dreamboard.fileio import schema, is_dreamb_file
+from dreamboard.fileio.errors import DreambFileIOError
+from dreamboard.fileio.sql import SQLiteIO
+from dreamboard.items import DreambPixmapItem, DreambTextItem
 
 
 @pytest.mark.parametrize('filename,expected',
-                         [(os.path.join('foo', 'bar.bee'), True),
+                         [(os.path.join('foo', 'bar.dreamb'), True),
                           (os.path.join('foo', 'bar.png'), False),
                           (os.path.join('foo', 'bar'), False)])
-def test_is_bee_file(filename, expected):
-    assert is_bee_file(filename) is expected
+def test_is_dreamb_file(filename, expected):
+    assert is_dreamb_file(filename) is expected
 
 
 def test_sqliteio_migrate_does_nothing_when_version_ok(tmpfile):
@@ -26,13 +26,13 @@ def test_sqliteio_migrate_does_nothing_when_version_ok(tmpfile):
     io.ex('PRAGMA user_version=%s' % schema.USER_VERSION)
     io.connection.commit()
     del io
-    with patch('beeref.fileio.sql.SQLiteIO.ex') as ex_mock:
+    with patch('dreamboard.fileio.sql.SQLiteIO.ex') as ex_mock:
         SQLiteIO(tmpfile, MagicMock())
         ex_mock.assert_not_called()
 
 
-@patch('beeref.fileio.sql.USER_VERSION', 3)
-@patch('beeref.fileio.sql.MIGRATIONS', {
+@patch('dreamboard.fileio.sql.USER_VERSION', 3)
+@patch('dreamboard.fileio.sql.MIGRATIONS', {
     2: ['CREATE TABLE foo (col1 INT)',
         'CREATE TABLE bar (baz INT)'],
     3: ['ALTER TABLE foo ADD COLUMN col2 TEXT']})
@@ -48,8 +48,8 @@ def test_sqliteio_migrate_migrates(tmpfile):
     assert result[0] == 3
 
 
-@patch('beeref.fileio.sql.USER_VERSION', 3)
-@patch('beeref.fileio.sql.MIGRATIONS', {
+@patch('dreamboard.fileio.sql.USER_VERSION', 3)
+@patch('dreamboard.fileio.sql.MIGRATIONS', {
     2: ['CREATE TABLE foo (col1 INT)',
         'CREATE TABLE bar (baz INT)'],
     3: ['ALTER TABLE foo ADD COLUMN col2 TEXT']})
@@ -74,7 +74,7 @@ def test_sqliteio_migrate_migrates_when_file_not_writable(tmpfile):
 def test_all_migrations(tmpfile):
     io = SQLiteIO(tmpfile, MagicMock(), create_new=True)
 
-    # Set up version 1 bee file
+    # Set up version 1 dreamb file
     io.ex('PRAGMA user_version=1')
     io.ex("""
         CREATE TABLE items (
@@ -102,7 +102,7 @@ def test_all_migrations(tmpfile):
     io.ex('INSERT INTO items '
           '(type, x, y, z, scale, rotation, flip, filename) '
           'VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
-          ('pixmap', 22.2, 33.3, 0.22, 3.4, 45, -1, 'bee.png'))
+          ('pixmap', 22.2, 33.3, 0.22, 3.4, 45, -1, 'dreamb.png'))
     io.ex('INSERT INTO sqlar (item_id, data) VALUES (?, ?)',
           (1, b'bla'))
     io.connection.commit()
@@ -116,7 +116,7 @@ def test_all_migrations(tmpfile):
         'LEFT OUTER JOIN sqlar on sqlar.item_id = items.id')
     assert result[0] == 22.2
     assert result[1] == 33.3
-    assert json.loads(result[2]) == {'filename': 'bee.png'}
+    assert json.loads(result[2]) == {'filename': 'dreamb.png'}
     assert result[3] == b'bla'
 
 
@@ -152,7 +152,7 @@ def test_sqliteio_create_schema_on_new_when_create_new(tmpfile):
     scene_mock.clear_save_ids.assert_called_once()
 
 
-@patch('beeref.fileio.sql.SQLiteIO._migrate')
+@patch('dreamboard.fileio.sql.SQLiteIO._migrate')
 def test_sqliteio_create_schema_on_new_when_not_create_new(
         migrate_mock, tmpfile):
     scene_mock = MagicMock()
@@ -170,7 +170,7 @@ def test_sqliteio_readonly_doesnt_allow_write(view, tmpfile):
         f.write('foobar')
     io = SQLiteIO(tmpfile, view.scene, readonly=True)
 
-    with pytest.raises(BeeFileIOError) as exinfo:
+    with pytest.raises(DreambFileIOError) as exinfo:
         io.write()
 
     assert exinfo.value.filename == tmpfile
@@ -197,7 +197,7 @@ def test_sqliteio_write_calls_write_meta(tmpfile, view):
 
 
 def test_sqliteio_write_inserts_new_text_item(tmpfile, view):
-    item = BeeTextItem(text='foo bar')
+    item = DreambTextItem(text='foo bar')
     view.scene.addItem(item)
     item.setScale(1.3)
     item.setPos(44, 55)
@@ -226,7 +226,7 @@ def test_sqliteio_write_inserts_new_text_item(tmpfile, view):
 
 
 def test_sqliteio_write_inserts_new_pixmap_item(tmpfile, view):
-    item = BeePixmapItem(QtGui.QImage(), filename='bee.jpg')
+    item = DreambPixmapItem(QtGui.QImage(), filename='dreamb.jpg')
     view.scene.addItem(item)
     item.setScale(1.3)
     item.setPos(44, 55)
@@ -251,12 +251,12 @@ def test_sqliteio_write_inserts_new_pixmap_item(tmpfile, view):
     assert result[4] == 33
     assert result[5] == -1
     assert json.loads(result[6]) == {
-        'filename': 'bee.jpg',
+        'filename': 'dreamb.jpg',
         'crop': [5, 5, 100, 80],
     }
     assert result[7] == 'pixmap'
     assert result[8] == b'abc'
-    assert result[9] == '0001-bee.png'
+    assert result[9] == '0001-dreamb.png'
 
 
 def test_sqliteio_write_inserts_new_pixmap_item_without_filename(
@@ -274,7 +274,7 @@ def test_sqliteio_write_inserts_new_pixmap_item_without_filename(
 
 
 def test_sqliteio_write_updates_existing_text_item(tmpfile, view):
-    item = BeeTextItem(text='foo bar')
+    item = DreambTextItem(text='foo bar')
     view.scene.addItem(item)
     item.setScale(1.3)
     item.setPos(44, 55)
@@ -308,7 +308,7 @@ def test_sqliteio_write_updates_existing_text_item(tmpfile, view):
 
 
 def test_sqliteio_write_updates_existing_pixmap_item(tmpfile, view):
-    item = BeePixmapItem(QtGui.QImage(), filename='bee.png')
+    item = DreambPixmapItem(QtGui.QImage(), filename='dreamb.png')
     view.scene.addItem(item)
     item.setScale(1.3)
     item.setPos(44, 55)
@@ -349,7 +349,7 @@ def test_sqliteio_write_updates_existing_pixmap_item(tmpfile, view):
 
 
 def test_sqliteio_write_removes_nonexisting_text_item(tmpfile, view):
-    item = BeeTextItem('foo bar')
+    item = DreambTextItem('foo bar')
     item.setScale(1.3)
     item.setPos(44, 55)
     view.scene.addItem(item)
@@ -365,7 +365,7 @@ def test_sqliteio_write_removes_nonexisting_text_item(tmpfile, view):
 
 
 def test_sqliteio_write_removes_nonexisting_pixmap_item(tmpfile, view):
-    item = BeePixmapItem(QtGui.QImage(), filename='bee.png')
+    item = DreambPixmapItem(QtGui.QImage(), filename='dreamb.png')
     item.setScale(1.3)
     item.setPos(44, 55)
     view.scene.addItem(item)
@@ -381,7 +381,7 @@ def test_sqliteio_write_removes_nonexisting_pixmap_item(tmpfile, view):
 
 
 def test_sqliteio_write_update_recovers_from_borked_file(view, tmpfile):
-    item = BeePixmapItem(QtGui.QImage(), filename='bee.png')
+    item = DreambPixmapItem(QtGui.QImage(), filename='dreamb.png')
     view.scene.addItem(item)
 
     with open(tmpfile, 'w') as f:
@@ -396,7 +396,7 @@ def test_sqliteio_write_update_recovers_from_borked_file(view, tmpfile):
 def test_sqliteio_write_updates_progress(tmpfile, view):
     worker = MagicMock(canceled=False)
     io = SQLiteIO(tmpfile, view.scene, create_new=True, worker=worker)
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
     io.write()
     worker.begin_processing.emit.assert_called_once_with(1)
@@ -407,9 +407,9 @@ def test_sqliteio_write_updates_progress(tmpfile, view):
 def test_sqliteio_write_canceled(tmpfile, view):
     worker = MagicMock(canceled=True)
     io = SQLiteIO(tmpfile, view.scene, create_new=True, worker=worker)
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
-    item = BeePixmapItem(QtGui.QImage())
+    item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
     io.write()
     worker.begin_processing.emit.assert_called_once_with(2)
@@ -452,7 +452,7 @@ def test_sqliteio_read_reads_readonly_pixmap_item(tmpfile, view, imgdata3x3):
           '(type, x, y, z, scale, rotation, flip, data) '
           'VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
           ('pixmap', 22.2, 33.3, 0.22, 3.4, 45, -1,
-           json.dumps({'filename': 'bee.png'})))
+           json.dumps({'filename': 'dreamb.png'})))
     io.ex('INSERT INTO sqlar (item_id, data) VALUES (?, ?)',
           (1, imgdata3x3))
     io.connection.commit()
@@ -471,7 +471,7 @@ def test_sqliteio_read_reads_readonly_pixmap_item(tmpfile, view, imgdata3x3):
     assert item.scale() == 3.4
     assert item.rotation() == 45
     assert item.flip() == -1
-    assert item.filename == 'bee.png'
+    assert item.filename == 'dreamb.png'
     assert item.width == 3
     assert item.height == 3
     assert view.scene.items_to_add.empty() is True
@@ -485,7 +485,7 @@ def test_sqliteio_read_updates_progress(tmpfile, view):
     io.create_schema_on_new()
     io.ex('INSERT INTO items (type, x, y, z, scale, data) '
           'VALUES (?, ?, ?, ?, ?, ?) ',
-          ('pixmap', 0, 0, 0, 1, json.dumps({'filename': 'bee.png'})))
+          ('pixmap', 0, 0, 0, 1, json.dumps({'filename': 'dreamb.png'})))
     io.ex('INSERT INTO sqlar (item_id, data) VALUES (?, ?)', (1, b''))
     io.connection.commit()
 
@@ -501,11 +501,11 @@ def test_sqliteio_read_canceled(tmpfile, view):
     io.create_schema_on_new()
     io.ex('INSERT INTO items (type, x, y, z, scale, data) '
           'VALUES (?, ?, ?, ?, ?, ?) ',
-          ('pixmap', 0, 0, 0, 1, json.dumps({'filename': 'bee.png'})))
+          ('pixmap', 0, 0, 0, 1, json.dumps({'filename': 'dreamb.png'})))
     io.ex('INSERT INTO sqlar (item_id, data) VALUES (?, ?)', (1, b''))
     io.ex('INSERT INTO items (type, x, y, z, scale, data) '
           'VALUES (?, ?, ?, ?, ?, ?) ',
-          ('pixmap', 50, 50, 0, 1, json.dumps({'filename': 'bee2.png'})))
+          ('pixmap', 50, 50, 0, 1, json.dumps({'filename': 'dreamb2.png'})))
     io.ex('INSERT INTO sqlar (item_id, data) VALUES (?, ?)', (2, b''))
     io.connection.commit()
 
@@ -520,7 +520,7 @@ def test_sqliteio_read_raises_error_when_file_borked(view, tmpfile):
         f.write('foobar')
 
     io = SQLiteIO(tmpfile, view.scene, readonly=True)
-    with pytest.raises(BeeFileIOError) as exinfo:
+    with pytest.raises(DreambFileIOError) as exinfo:
         io.read()
     assert exinfo.value.filename == tmpfile
 
@@ -540,7 +540,7 @@ def test_sqliteio_read_emits_error_message_when_file_borked(view, tmpfile):
 
 def test_sqliteio_read_raises_error_when_file_empty(view, tmpfile):
     io = SQLiteIO(tmpfile, view.scene, readonly=True)
-    with pytest.raises(BeeFileIOError) as exinfo:
+    with pytest.raises(DreambFileIOError) as exinfo:
         io.read()
     assert exinfo.value.filename == tmpfile
 

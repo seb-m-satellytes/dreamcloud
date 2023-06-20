@@ -14,7 +14,7 @@ dev = [
 ]
 
 [project]
-name = "BeeRef-Cloud"
+name = "DreamBoard-Cloud"
 version = "0.3.1"
 description = "A simple reference image viewer"
 readme = "README.rst"
@@ -34,10 +34,10 @@ license = {text = "LICENSE"}
 requires-python = "==3.10.*"
 
 [project.urls]
-Homepage = "https://github.com/rbreu/beeref"
+Homepage = "https://github.com/rbreu/dreamboard"
 
 [project.gui-scripts]
-beeref = "beeref.__main__:main"
+dreamboard = "dreamboard.__main__:main"
 
 
 [build-system]

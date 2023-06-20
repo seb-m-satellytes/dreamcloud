@@ -38,14 +38,14 @@ Fixed
 0.2.0 - 2021-09-06
 ==================
 
-Note that bee files from version 0.2.0 won't open in BeeRef 0.1.x.
+Note that dreamb files from version 0.2.0 won't open in DreamBoard 0.1.x.
 
 Added
 -----
 
 * You can now add plain text notes and paste text from the clipboard
-* You can now open bee files from finder on MacOS (by David Andrs)
-* Dragging bee files onto an empty scene will now open them
+* You can now open dreamb files from finder on MacOS (by David Andrs)
+* Dragging dreamb files onto an empty scene will now open them
 * Adding the first image(s) to a new scene centers the view
 
 Changed
@@ -69,7 +69,7 @@ Changed
 -------
 
 * Flipping an image now happens on mouse press instead of mouse release
-* About dialog points to new website beeref.org
+* About dialog points to new website dreamboard.org
 * Menus and dialogs now have a dark style to match the optics of the canvas
 
 Fixed
