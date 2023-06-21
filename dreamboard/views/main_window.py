@@ -1,6 +1,6 @@
 from dreamboard.assets import DreambAssets
 from dreamboard.views.board_view import DreambGraphicsView
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 from dreamboard import constants
 
 
@@ -11,6 +11,10 @@ class DreamBoardMainWindow(QtWidgets.QMainWindow):
         app.setOrganizationName(constants.APPNAME)
         app.setApplicationName(constants.APPNAME)
         self.setWindowIcon(DreambAssets().logo)
+
+        # save the presets
+        self.presets = {}
+        
         self.view = DreambGraphicsView(app, self)
         self.info_dock_widget = QtWidgets.QDockWidget('Info', self)
 
@@ -27,7 +31,6 @@ class DreamBoardMainWindow(QtWidgets.QMainWindow):
         self.info_text.textChanged.connect(self.updateItemMetadata)
         self.source_link.textChanged.connect(self.updateItemMetadata)
         self.source_is_local.stateChanged.connect(self.updateItemMetadata)
-      
         # Add the fields to the layout
         layout.addWidget(self.info_text)
         layout.addWidget(self.source_link)

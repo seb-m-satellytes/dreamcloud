@@ -96,10 +96,11 @@ def upload_to_firebase(file_data, file_name):
     )
 
 
-def save_dreamb_cloud(scene, clean, worker=None):
+def save_dreamb_cloud(scene, clean, local_presets, worker=None):
     # if clean:
     #   logger.info('Nothing to save.')
     #   return
+    print(local_presets)
 
     logger.info('Saving...')
     # Get Firestore client and Cloud Storage bucket
@@ -122,9 +123,22 @@ def save_dreamb_cloud(scene, clean, worker=None):
     board_images_ref = db.collection("boards").document(doc_ref.id).collection("images")
     board_presets_ref = db.collection("boards").document(doc_ref.id).collection("presets")
     presets_docs = board_presets_ref.stream()
-    preset_snapshot = next(presets_docs)
-    current_preset = preset_snapshot.to_dict()
-    current_preset_id = preset_snapshot.id
+
+    preset_doc_ids = [p.id for p in presets_docs]
+
+    for preset_id, preset in list(local_presets.items()):  # We convert to list for safe iteration while removing items
+        # Find presets that are in local_presets but not in the cloud
+        print('all', preset_id, preset_doc_ids)
+        if preset_id not in preset_doc_ids:
+            print('# add to cloud')
+            _, new_preset_ref = board_presets_ref.add(preset)
+
+            # replace preset_id with firestore id
+            local_presets.pop(preset_id)
+            local_presets[new_preset_ref.id] = preset
+        else:
+            print('# update in cloud')
+            board_presets_ref.document(preset_id).update(preset)
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
@@ -175,22 +189,25 @@ def save_dreamb_cloud(scene, clean, worker=None):
                 "updated_at": firestore.SERVER_TIMESTAMP
             }
 
+            save_to_preset = False
+
             updated_image_data_in_preset = {
-                "x": item.x(),
-                "y": item.y(),
+                "x": item.get_pos_center().x(),
+                "y": item.get_pos_center().y(),
                 "scale": item.scale(),
                 "rotation": item.rotation(),
             }
 
-            print('save to' + current_preset["name"])
-
             try:
                 board_images_ref.document(item_uuid).update(updated_image_data)
-                image_id = f"images.{item_uuid.replace('-', '_')}"
-                board_presets_ref.document(current_preset_id).update({
-                    image_id: updated_image_data_in_preset,
-                    "updated_at": firestore.SERVER_TIMESTAMP
-                })
+                if save_to_preset:
+                    preset_snapshot = next(presets_docs)
+                    current_preset_id = preset_snapshot.id
+                    image_id = f"images.{item_uuid.replace('-', '_')}"
+                    board_presets_ref.document(current_preset_id).update({
+                        image_id: updated_image_data_in_preset,
+                        "updated_at": firestore.SERVER_TIMESTAMP
+                    })
             except Exception as e:
                 logger.error('Error updating image to cloud with error: ' + str(e))
 
@@ -217,8 +234,16 @@ def load_board(scene, mainWindow):
         presets_ref = board_ref.collection("presets")
         presets_docs = presets_ref.stream()
 
-        current_preset = next(presets_docs).to_dict()
-        apply_current_preset = True
+        mainWindow.presets = {}
+
+        for doc in presets_docs:
+            mainWindow.presets[doc.id] = doc.to_dict()
+
+        # Get the first preset
+        current_preset = next(iter(mainWindow.presets.values()), None)
+        apply_current_preset = False
+
+        print('fetched and saved presets:', mainWindow.presets)
 
         # Fetch all images for this board
         images_ref = board_ref.collection("images")
@@ -227,7 +252,6 @@ def load_board(scene, mainWindow):
         items = []
         # Iterate over each image
         for image_doc in images_docs:
-            image_data_in_preset = current_preset["images"].get(image_doc.id.replace('-', '_'))
             image_data = image_doc.to_dict()
             logger.info(f'Loading image from file {image_data["storage_url"]}')
 
@@ -240,6 +264,7 @@ def load_board(scene, mainWindow):
             item = DreambPixmapItem(img, image_data["filename"], mainWindow.toggleSidebar)
 
             if (apply_current_preset):
+                image_data_in_preset = current_preset["images"].get(image_doc.id.replace('-', '_'))
                 print(f"Applying preset to image: {image_data_in_preset['x']} {image_data_in_preset['y']}")
                 item.set_pos_center(QtCore.QPointF(image_data_in_preset["x"], image_data_in_preset["y"]))
                 item.setRotation(image_data_in_preset["rotation"])

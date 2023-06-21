@@ -72,6 +72,18 @@ menu_structure = [
         ],
     },
     {
+        'menu': '&Presets',
+        'items': [
+            {
+                'menu': 'Open &Recent',
+                'items': '_build_presets',
+            },
+            MENU_SEPARATOR,
+            'save_preset',
+            'delete_preset',
+        ]
+    },
+    {
         'menu': '&Transform',
         'items': [
             'crop',

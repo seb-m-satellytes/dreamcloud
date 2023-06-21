@@ -73,11 +73,6 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         # self.setRenderHint(QPainter.RenderHint.LosslessImageRendering)
         # self.setRenderHint(QPainter.RenderHint.VerticalSubpixelPositioning)
 
-        # Context menu and actions
-        self.build_menu_and_actions()
-        self.control_target = self
-        self.init_main_controls()
-
         # Load file given via command line
         if commandline_args.filename:
             self.open_from_file(commandline_args.filename)
@@ -86,11 +81,16 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         load_board(self.scene, parent)
         QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
 
+        # Context menu and actions
+        self.build_menu_and_actions()
+        self.control_target = self
+        self.init_main_controls()
+
         self.timer = QTimer()
         clean = self.undo_stack.isClean()
-        print(self.undo_stack)
-        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, clean))
-        self.timer.start(60000)
+
+        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, clean, self.parent.presets))
+        self.timer.start(30000)
 
     @property
     def filename(self):
@@ -344,6 +344,17 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             parent=self)
         self.worker.start()
 
+    def on_apply_preset(self, preset):
+        selected_preset = self.parent.presets[preset]
+        for item in self.scene.items():
+            item_uuid = item.data(0).replace('-', '_')
+            item_transforms = selected_preset['images'][item_uuid] if item_uuid in selected_preset['images'] else {}
+
+            item.setPos(QtCore.QPointF(float(item_transforms['x']), float(item_transforms['y'])))
+            item.setRotation(item_transforms['rotation'])
+            item.setScale(item_transforms['scale'])
+            print('item is at', item.x(), item.y())
+
     def on_action_open(self):
         self.scene.cancel_crop_mode()
         filename, f = QtWidgets.QFileDialog.getOpenFileName(
@@ -380,7 +391,8 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
 
     def do_save_cloud(self):
         clean = self.undo_stack.isClean()
-        self.worker = fileio.ThreadedIO(lambda: save_dreamb_cloud(self.scene, clean))
+        print()
+        self.worker = fileio.ThreadedIO(lambda: save_dreamb_cloud(self.scene, clean, self.parent.presets))
         self.worker.finished.connect(self.on_saving_finished)
         # self.progress = widgets.DreambProgressDialog(
         #    'Saving to cloud...',
@@ -544,6 +556,30 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         dirname = os.path.dirname(self.settings.fileName())
         QtGui.QDesktopServices.openUrl(
             QtCore.QUrl.fromLocalFile(dirname))
+
+    def on_action_save_preset(self):
+        print('save preset')
+        new_preset_images = {}  # This dictionary will store the images
+        for item in self.scene.items():
+            item_uuid = item.data(0).replace('-', '_')
+            new_preset_images[item_uuid] = {
+                'x': item.x(),
+                'y': item.y(),
+                'rotation': item.rotation(),
+                'scale': item.scale(),
+            }
+
+        # show a dialog to enter a name for the preset
+        preset_name, ok = QtWidgets.QInputDialog.getText(self, 'Save Preset', 'Enter preset name:')
+        if ok:
+            new_preset = {"name": preset_name, "images": new_preset_images}
+            # add the preset to the presets dict
+            self.parent.presets[preset_name] = new_preset
+        else:
+            print('no preset name entered')
+
+    def on_action_delete_preset(self):
+        print('delete preset')
 
     def on_selection_changed(self):
         logger.debug('Currently selected items: %s',

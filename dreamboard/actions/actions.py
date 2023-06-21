@@ -289,4 +289,14 @@ actions = [
         'text': 'Open Settings Folder',
         'callback': 'on_action_open_settings_dir',
     },
+    {
+        'id': 'save_preset',
+        'text': 'Save &Preset...',
+        'callback': 'on_action_save_preset',
+    },
+     {
+        'id': 'delete_preset',
+        'text': 'Delete &Preset...',
+        'callback': 'on_action_delete_preset',
+    }
 ]

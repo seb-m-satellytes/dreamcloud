@@ -26,12 +26,12 @@ from dreamboard.config import KeyboardSettings
 
 
 class ActionsMixin:
-
     def actiongroup_set_enabled(self, group, value):
         for action in self.dreamb_actiongroups[group]:
             action.setEnabled(value)
 
     def build_menu_and_actions(self):
+        print('build menu and actions')
         """Creates a new menu or rebuilds the given menu."""
         self.context_menu = QtWidgets.QMenu(self)
         self.toplevel_menus = []
@@ -46,6 +46,7 @@ class ActionsMixin:
 
     def update_menu_and_actions(self):
         self._build_recent_files()
+        self._build_presets()
 
     def create_menubar(self):
         menu_bar = QtWidgets.QMenuBar()
@@ -104,6 +105,16 @@ class ActionsMixin:
                 self._create_menu(actions, submenu, item['items'])
 
         return menu
+
+    def _build_presets(self, menu=None):
+        if menu:
+            self._presets_submenu = menu
+
+        i = -1
+        for i, presetname in enumerate(self.parent.presets):
+            paction = QtGui.QAction(self.parent.presets[presetname]["name"], self)
+            self._presets_submenu.addAction(paction)
+            paction.triggered.connect(partial(self.on_apply_preset, presetname))
 
     def _build_recent_files(self, menu=None):
         if menu:

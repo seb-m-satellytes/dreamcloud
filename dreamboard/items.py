@@ -48,6 +48,10 @@ class DreambItemMixin(SelectableMixin):
         """Sets the position using the item's center as the origin point."""
         self.setPos(pos - self.center_scene_coords)
 
+    def get_pos_center(self):
+        """Gets the position using the item's center as the origin point."""
+        return self.center_scene_coords
+
     def has_selection_outline(self):
         return self.isSelected()
 
