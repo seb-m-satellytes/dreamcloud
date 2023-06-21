@@ -35,6 +35,6 @@ COLORS = {
 
     # DreamBoard specific:
     'Scene:Selection': (116, 234, 231),
-    'Scene:Canvas': (30, 30, 30),
+    'Scene:Canvas': (255, 255, 255),
     'Scene:Text': (200, 200, 200)
 }

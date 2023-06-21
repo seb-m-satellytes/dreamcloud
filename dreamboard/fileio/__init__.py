@@ -96,7 +96,11 @@ def upload_to_firebase(file_data, file_name):
     )
 
 
-def save_dreamb_cloud(scene, worker=None):
+def save_dreamb_cloud(scene, clean, worker=None):
+    if clean:
+        logger.info('Nothing to save.')
+        return
+
     logger.info('Saving...')
     # Get Firestore client and Cloud Storage bucket
     db = firebase.get_firestore()
@@ -206,6 +210,14 @@ def load_board(scene):
             item.setScale(image_data["scale"])
 
             item.setData(0, image_data["uuid"])
+
+            item.setData(1, {
+                "meta": {
+                    "info_text": image_data["info_text"],
+                    "source_link": image_data["source_link"],
+                    "source_is_local": image_data["source_is_local"]
+                }
+            })
 
             scene.addItem(item)
             items.append(item)

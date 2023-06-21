@@ -18,6 +18,7 @@ text).
 """
 
 import logging
+import os
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QGraphicsItem
@@ -31,6 +32,8 @@ from dreamboard.selection import SelectableMixin
 logger = logging.getLogger(__name__)
 
 item_registry = {}
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def register_item(cls):
@@ -93,6 +96,12 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
         self.hasChanged = False
         self.isNew = False
         self.init_selectable()
+        self.info_icon = QtGui.QPixmap(os.path.join(current_dir, "assets/icon_info.png"))
+        if self.info_icon.isNull():
+            print("Failed to load image")
+        else:
+            print("Image loaded successfully")
+        self.info_icon_visible = False
 
     @classmethod
     def create_from_data(self, **kwargs):
@@ -303,6 +312,10 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
             painter.drawPixmap(self.crop, self.pixmap(), self.crop)
             self.paint_selectable(painter, option, widget)
 
+        if self.is_hovered and self.info_icon:
+            print('painting info icon', self.info_icon.width())
+            painter.drawPixmap(24, 24, self.info_icon.scaled(QtCore.QSize(64, 64), Qt.AspectRatioMode.KeepAspectRatio))
+
     def enter_crop_mode(self):
         logger.debug(f'Entering crop mode on {self}')
         self.prepareGeometryChange()
@@ -335,6 +348,18 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
             self.exit_crop_mode(confirm=False)
         else:
             super().keyPressEvent(event)
+
+    def hoverEnterEvent(self, event):
+        print('hover enter')
+        self.is_hovered = True
+        self.update()  # Call this to force a repaint
+        super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        print('hover leave')
+        self.is_hovered = False
+        self.update()  # Call this to force a repaint
+        super().hoverLeaveEvent(event)
 
     def hoverMoveEvent(self, event):
         if not self.crop_mode:

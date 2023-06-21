@@ -8,7 +8,7 @@ from PyQt6.QtCore import Qt
 
 from dreamboard.config import logfile_name
 from dreamboard.items import DreambPixmapItem, DreambTextItem
-from dreamboard.view import DreambGraphicsView
+from dreamboard.views.board_view import DreambGraphicsView
 
 
 def test_inits_menu(view, qapp):

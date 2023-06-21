@@ -87,7 +87,8 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
 
         self.timer = QTimer()
-        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene))
+        clean = self.undo_stack.isClean()
+        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, clean))
         self.timer.start(60000)
 
     @property

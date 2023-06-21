@@ -19,15 +19,18 @@ import logging
 import platform
 import signal
 import sys
+import os
+import json
 
 from PyQt6 import QtCore, QtWidgets
 
 from dreamboard import constants
-from dreamboard.assets import DreambAssets
 from dreamboard.config import CommandlineArgs, DreambSettings, logfile_name
 from dreamboard.utils import create_palette_from_dict
-from dreamboard.view import DreambGraphicsView
 from dreamboard.user import LoginDialog
+from dreamboard.views.main_window import DreamBoardMainWindow
+import dreamboard.user_instance as user_instance
+from dreamboard.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -43,33 +46,6 @@ class DreamBoardApplication(QtWidgets.QApplication):
             return False
         else:
             return super().event(event)
-
-
-class DreamBoardMainWindow(QtWidgets.QMainWindow):
-
-    def __init__(self, app):
-        super().__init__()
-        app.setOrganizationName(constants.APPNAME)
-        app.setApplicationName(constants.APPNAME)
-        self.setWindowIcon(DreambAssets().logo)
-        self.view = DreambGraphicsView(app, self)
-        default_window_size = QtCore.QSize(500, 300)
-        geom = self.view.settings.value('MainWindow/geometry')
-        if geom is None:
-            self.resize(default_window_size)
-        else:
-            if not self.restoreGeometry(geom):
-                self.resize(default_window_size)
-        self.setCentralWidget(self.view)
-        self.show()
-
-    def closeEvent(self, event):
-        geom = self.saveGeometry()
-        self.view.settings.setValue('MainWindow/geometry', geom)
-        event.accept()
-
-    def __del__(self):
-        del self.view
 
 
 def safe_timer(timeout, func, *args, **kwargs):
@@ -117,7 +93,14 @@ def main():
     safe_timer(50, lambda: None)
 
     login_dialog = LoginDialog()
-    if login_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+
+    if os.path.exists('user.json'):
+        with open('user.json', 'r') as file:
+            user_uid = json.load(file)
+            user_instance.user = User(user_uid)
+
+        dreamb = DreamBoardMainWindow(app)  # NOQA:F841
+    elif login_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
         dreamb = DreamBoardMainWindow(app)  # NOQA:F841
         print('Login accepted')
     else:

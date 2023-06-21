@@ -4,7 +4,7 @@ from PyQt6 import QtCore
 
 from dreamboard.__main__ import DreamBoardMainWindow, main
 from dreamboard.assets import DreambAssets
-from dreamboard.view import DreambGraphicsView
+from dreamboard.views.board_view import DreambGraphicsView
 
 
 @patch('PyQt6.QtWidgets.QWidget.show')

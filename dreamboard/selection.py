@@ -137,6 +137,7 @@ class SelectableMixin(BaseItemMixin):
         self.viewport_scale = 1
         self.reset_actions()
         self.is_editable = False
+        self.is_hovered = False
 
     def reset_actions(self):
         self.scale_active = False
@@ -385,6 +386,7 @@ class SelectableMixin(BaseItemMixin):
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
     def hoverEnterEvent(self, event):
+        super().hoverEnterEvent(event)
         # Always return regular cursor when there aren't any selection handles
         if not self.has_selection_handles():
             self.setCursor(Qt.CursorShape.ArrowCursor)

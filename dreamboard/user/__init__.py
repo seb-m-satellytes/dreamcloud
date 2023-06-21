@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QLabel, QPushButton
 import requests
 from dotenv import load_dotenv
 import os
+import json
 import dreamboard.user_instance as user_instance
 
 load_dotenv()
@@ -70,6 +71,9 @@ class LoginDialog(QDialog):
             # print(f'ID Token: {id_token}')
             # print(f'Refresh Token: {user_uid}')
             user_instance.user = User(user_uid)
+
+            with open('user.json', 'w') as file:
+                json.dump(user_uid, file)
 
             self.accept()
         else:
