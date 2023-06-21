@@ -83,11 +83,12 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             self.open_from_file(commandline_args.filename)
         self.update_window_title()
 
-        load_board(self.scene)
+        load_board(self.scene, parent)
         QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
 
         self.timer = QTimer()
         clean = self.undo_stack.isClean()
+        print(self.undo_stack)
         self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, clean))
         self.timer.start(60000)
 
@@ -378,7 +379,8 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         self.worker.start()
 
     def do_save_cloud(self):
-        self.worker = fileio.ThreadedIO(fileio.save_dreamb_cloud, self.scene)
+        clean = self.undo_stack.isClean()
+        self.worker = fileio.ThreadedIO(lambda: save_dreamb_cloud(self.scene, clean))
         self.worker.finished.connect(self.on_saving_finished)
         # self.progress = widgets.DreambProgressDialog(
         #    'Saving to cloud...',

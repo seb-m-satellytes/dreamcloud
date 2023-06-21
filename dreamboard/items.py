@@ -85,7 +85,9 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
     TYPE = 'pixmap'
     CROP_HANDLE_SIZE = 15
 
-    def __init__(self, image, filename=None):
+    infoIconClicked = QtCore.pyqtSignal(QtWidgets.QGraphicsPixmapItem)
+
+    def __init__(self, image, filename=None, info_icon_callback=None):
         super().__init__(QtGui.QPixmap.fromImage(image))
         self.save_id = None
         self.filename = filename
@@ -95,12 +97,9 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
         self.crop_mode = False
         self.hasChanged = False
         self.isNew = False
+        self.info_icon_callback = info_icon_callback
         self.init_selectable()
         self.info_icon = QtGui.QPixmap(os.path.join(current_dir, "assets/icon_info.png"))
-        if self.info_icon.isNull():
-            print("Failed to load image")
-        else:
-            print("Image loaded successfully")
         self.info_icon_visible = False
 
     @classmethod
@@ -313,7 +312,6 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
             self.paint_selectable(painter, option, widget)
 
         if self.is_hovered and self.info_icon:
-            print('painting info icon', self.info_icon.width())
             painter.drawPixmap(24, 24, self.info_icon.scaled(QtCore.QSize(64, 64), Qt.AspectRatioMode.KeepAspectRatio))
 
     def enter_crop_mode(self):
@@ -350,13 +348,11 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
             super().keyPressEvent(event)
 
     def hoverEnterEvent(self, event):
-        print('hover enter')
         self.is_hovered = True
         self.update()  # Call this to force a repaint
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        print('hover leave')
         self.is_hovered = False
         self.update()  # Call this to force a repaint
         super().hoverLeaveEvent(event)
@@ -375,7 +371,17 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
                 return
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
+    def showSidebar(self):
+        self.info_icon_callback(self)
+
     def mousePressEvent(self, event):
+        # x,y, width, height of icon
+        if QtCore.QRectF(24, 24, 64, 64).contains(event.pos()):
+            self.showSidebar()
+        else:
+            # Pass the event to the parent class, so it can be handled normally.
+            super().mousePressEvent(event)
+
         if not self.crop_mode:
             return super().mousePressEvent(event)
 

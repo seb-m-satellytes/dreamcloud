@@ -97,9 +97,9 @@ def upload_to_firebase(file_data, file_name):
 
 
 def save_dreamb_cloud(scene, clean, worker=None):
-    if clean:
-        logger.info('Nothing to save.')
-        return
+    # if clean:
+    #   logger.info('Nothing to save.')
+    #   return
 
     logger.info('Saving...')
     # Get Firestore client and Cloud Storage bucket
@@ -145,6 +145,9 @@ def save_dreamb_cloud(scene, clean, worker=None):
                 "scale": item.scale(),
                 "rotation": item.rotation(),
                 "flip": item.flip(),
+                "info_text": item.data(1)['meta']['info_text'],
+                "source_link": item.data(1)['meta']['source_link'],
+                "source_is_local": item.data(1)['meta']['source_is_local'],
                 "created_at": firestore.SERVER_TIMESTAMP
             }
 
@@ -161,6 +164,9 @@ def save_dreamb_cloud(scene, clean, worker=None):
                 "scale": item.scale(),
                 "rotation": item.rotation(),
                 "flip": item.flip(),
+                "info_text": item.data(1)['meta']['info_text'],
+                "source_link": item.data(1)['meta']['source_link'],
+                "source_is_local": item.data(1)['meta']['source_is_local'],
                 "updated_at": firestore.SERVER_TIMESTAMP
             }
 
@@ -174,7 +180,7 @@ def save_dreamb_cloud(scene, clean, worker=None):
             worker.progress.emit(i)
 
 
-def load_board(scene):
+def load_board(scene, mainWindow):
     # Get Firestore client and Cloud Storage bucket
     db = firebase.get_firestore()
     bucket = firebase.get_storage()
@@ -204,7 +210,7 @@ def load_board(scene):
 
             img = QtGui.QImage.fromData(image_data_bytes)
 
-            item = DreambPixmapItem(img, image_data["filename"])
+            item = DreambPixmapItem(img, image_data["filename"], mainWindow.toggleSidebar)
             item.set_pos_center(QtCore.QPointF(image_data["x"], image_data["y"]))
             item.setRotation(image_data["rotation"])
             item.setScale(image_data["scale"])

@@ -31,7 +31,6 @@ logger = logging.getLogger(__name__)
 
 
 class DreambGraphicsScene(QtWidgets.QGraphicsScene):
-
     def __init__(self, undo_stack):
         super().__init__()
         self.move_active = False
