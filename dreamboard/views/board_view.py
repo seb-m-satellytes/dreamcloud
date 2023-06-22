@@ -354,6 +354,7 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             item.setRotation(item_transforms['rotation'])
             item.setScale(item_transforms['scale'])
             print('item is at', item.x(), item.y())
+        self.on_action_fit_scene()
 
     def on_action_open(self):
         self.scene.cancel_crop_mode()

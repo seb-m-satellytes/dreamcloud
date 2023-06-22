@@ -100,7 +100,6 @@ def save_dreamb_cloud(scene, clean, local_presets, worker=None):
     # if clean:
     #   logger.info('Nothing to save.')
     #   return
-    print(local_presets)
 
     logger.info('Saving...')
     # Get Firestore client and Cloud Storage bucket
@@ -128,16 +127,15 @@ def save_dreamb_cloud(scene, clean, local_presets, worker=None):
 
     for preset_id, preset in list(local_presets.items()):  # We convert to list for safe iteration while removing items
         # Find presets that are in local_presets but not in the cloud
-        print('all', preset_id, preset_doc_ids)
         if preset_id not in preset_doc_ids:
-            print('# add to cloud')
+            print(f'{preset_id} added to cloud')
             _, new_preset_ref = board_presets_ref.add(preset)
 
             # replace preset_id with firestore id
             local_presets.pop(preset_id)
             local_presets[new_preset_ref.id] = preset
         else:
-            print('# update in cloud')
+            print(f'{preset_id} updated in cloud')
             board_presets_ref.document(preset_id).update(preset)
 
     # Iterate over each item in the scene
