@@ -112,9 +112,19 @@ class ActionsMixin:
 
         i = -1
         for i, presetname in enumerate(self.parent.presets):
-            paction = QtGui.QAction(self.parent.presets[presetname]["name"], self)
-            self._presets_submenu.addAction(paction)
-            paction.triggered.connect(partial(self.on_apply_preset, presetname))
+            qaction = QtGui.QAction(self.parent.presets[presetname]["name"], self)
+            self._presets_submenu.addAction(qaction)
+            qaction.triggered.connect(partial(self.on_apply_preset, presetname))
+
+    def _build_recent_boards(self, menu=None):
+        if menu:
+            self._recent_boards_submenu = menu
+
+        i = -1
+        for i, board in enumerate(self.parent.boards):
+            qaction = QtGui.QAction(board["name"], self)
+            self._recent_boards_submenu.addAction(qaction)
+            qaction.triggered.connect(partial(self.on_open_board, board))
 
     def _build_recent_files(self, menu=None):
         if menu:

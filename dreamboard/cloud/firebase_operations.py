@@ -27,6 +27,8 @@ def fetch_boards():
             # Get the list of board ids associated with the user
             board_ids = user_doc.to_dict().get("boards", [])
 
+            print('Board IDs', board_ids)
+
             for board_id in board_ids:
                 board_doc = boards_col.document(board_id).get()
                 if board_doc.exists:
@@ -40,6 +42,7 @@ def fetch_boards():
     except Exception as e:
         logger.error('Error fetching boards from cloud with error: ' + str(e))
 
+    print('Fetched boards from cloud.', boards)
     return boards
 
 
@@ -167,7 +170,7 @@ def update_presets_in_cloud(db, doc_ref, local_presets):
     for preset_id, preset in list(local_presets.items()):  # We convert to list for safe iteration while removing items
         # Find presets that are in local_presets but not in the cloud
         if preset_id not in preset_doc_ids:
-            print(f'{preset_id} added to cloud')
+            logger.info(f'Preset {preset_id} added to cloud')
             try:
                 _, new_preset_ref = board_presets_col.add(preset)
                 # replace preset_id with firestore id
@@ -178,7 +181,7 @@ def update_presets_in_cloud(db, doc_ref, local_presets):
                 continue
 
         else:
-            print(f'{preset_id} updated in cloud')
+            logger.info(f'Preset {preset_id} updated in cloud')
             try:
                 board_presets_col.document(preset_id).update(preset)
             except Exception as e:
@@ -186,26 +189,52 @@ def update_presets_in_cloud(db, doc_ref, local_presets):
                 continue
 
 
-def save_dreamb_cloud(scene, local_presets, worker=None):
-    logger.info('Saving...')
-    # Get Firestore client and Cloud Storage bucket
-    db = firebase.get_firestore()
+def create_board_in_cloud(db, user_doc, board_name) -> str:
+    users_col = db.collection("users")
 
-    boards = fetch_boards()
-
-    if (len(boards)):
-        # Fetch the first board
-        board_id = boards[0]["id"]
-        board_ref = db.collection("boards").document(board_id)
-        board_ref.update({"updated_at": datetime.now()})
-    else:
+    user_doc = users_col.document(user_instance.user.id).get()
+    if user_doc.exists:
         # Create a new board document in Firestore
         board_data = {
             "created_at": datetime.now(),
             "updated_at": datetime.now(),
-            "name": "Board Name"  # use actual board name here
+            "name": board_name  # use actual board name here
         }
-        _, board_ref = db.collection("boards").add(board_data)
+
+        try:
+            _, board_ref = db.collection("boards").add(board_data)
+            print('save to doc', user_doc)
+            user_doc.update({"boards": firestore.ArrayUnion([board_ref.id])})
+            return str(board_ref)
+        except Exception as e:
+            logger.error('Error creating board in cloud with error: ' + str(e))
+            return ''
+
+
+def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=None, worker=None):
+    logger.info('Saving...')
+    # Get Firestore client and Cloud Storage bucket
+    db = firebase.get_firestore()
+
+    # boards_local = list of boards with name and id
+    # current_board = id of current board
+
+    boards_cloud = fetch_boards()
+    print('Saving...', boards_local, current_board_id, boards_cloud, [b["id"] for b in boards_cloud])
+
+    # if current_board is not in boards_cloud, create it
+
+    if current_board_id and current_board_id not in [b["id"] for b in boards_cloud]:
+        board_name = [b["name"] for b in boards_local if b["id"] == current_board_id][0]
+        board_ref = create_board_in_cloud(db, user_instance.user, board_name)
+    elif (len(boards_cloud)):
+        board_ref = db.collection("boards").document(current_board_id)
+
+        try:
+            board_ref.update({"updated_at": datetime.now()})
+        except Exception as e:
+            logger.error('Error updating board in cloud with error: ' + str(e))
+            return
 
     board_images_col = db.collection("boards").document(board_ref.id).collection("images")
 
@@ -225,19 +254,24 @@ def save_dreamb_cloud(scene, local_presets, worker=None):
     logger.info('Saved!')
 
 
-def load_dreamb_cloud(scene, mainWindow):
+def load_dreamb_cloud(scene, mainWindow, board_id=None):
     logger.info('Loading...')
     # Get Firestore client and Cloud Storage bucket
     db = firebase.get_firestore()
     bucket = firebase.get_storage()
 
-    # Fetch all boards
+    # Fetch all boards, sorted by latest updated_at
     boards = fetch_boards()
 
-    # TODO: Add a way to select which board to load
-    # For this example, let's just load the first board
+    # Make the boards available to the mainWindow
+    mainWindow.boards = boards
+
     if len(boards) > 0:
-        board_id = boards[0]["id"]
+        if not board_id:
+            # Open the first board
+            board_id = boards[0]["id"]
+
+        mainWindow.current_board = board_id
         board_ref = db.collection("boards").document(board_id)
 
         fetch_presets_from_cloud(board_ref, mainWindow)

@@ -75,13 +75,23 @@ menu_structure = [
         'menu': '&Presets',
         'items': [
             {
-                'menu': 'Open &Recent',
+                'menu': 'Show &Presets',
                 'items': '_build_presets',
             },
             MENU_SEPARATOR,
             'save_preset',
             'delete_preset',
         ]
+    },
+    {
+        'menu': '&Board',
+        'items': [
+            {
+                'menu': 'Show &Boards',
+                'items': '_build_recent_boards',
+            },
+            'new_board',
+        ],
     },
     {
         'menu': '&Transform',

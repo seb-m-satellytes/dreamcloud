@@ -16,6 +16,10 @@ class DreamBoardMainWindow(QtWidgets.QMainWindow):
         # save the presets
         self.presets = {}
 
+        # save the boards
+        self.boards = []
+        self.current_board = None
+
         self.view = DreambGraphicsView(app, self)
         self.info_dock_widget = QtWidgets.QDockWidget('Info', self)
 

@@ -294,9 +294,14 @@ actions = [
         'text': 'Save &Preset...',
         'callback': 'on_action_save_preset',
     },
-     {
+    {
         'id': 'delete_preset',
         'text': 'Delete &Preset...',
         'callback': 'on_action_delete_preset',
+    },
+    {
+        'id': 'new_board',
+        'text': 'New &Board...',
+        'callback': 'on_action_new_board',
     }
 ]
