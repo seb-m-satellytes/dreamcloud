@@ -19,7 +19,7 @@ def fetch_boards():
     try:
         # Get reference to the users collection
         users_col = db.collection("users")
-        boards_col = db.collection("boards").order_by("updated_at", direction=firestore.Query.DESCENDING)
+        boards_col = db.collection("boards")
 
         # Fetch the user document
         user_doc = users_col.document(user_instance.user.id).get()
@@ -34,6 +34,8 @@ def fetch_boards():
                     board["id"] = board_doc.id
                     boards.append(board)
                     logger.info('Fetched boards from cloud.')
+
+            boards = sorted(boards, key=lambda x: x['updated_at'], reverse=True)
 
     except Exception as e:
         logger.error('Error fetching boards from cloud with error: ' + str(e))
