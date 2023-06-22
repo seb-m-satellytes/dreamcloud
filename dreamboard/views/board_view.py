@@ -30,7 +30,7 @@ from dreamboard import widgets
 from dreamboard.items import DreambPixmapItem, DreambTextItem
 from dreamboard.main_controls import MainControlsMixin
 from dreamboard.scene import DreambGraphicsScene
-from dreamboard.fileio import load_board, save_dreamb_cloud
+from dreamboard.cloud.firebase_operations import save_dreamb_cloud, load_dreamb_cloud
 
 
 commandline_args = CommandlineArgs()
@@ -78,7 +78,7 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             self.open_from_file(commandline_args.filename)
         self.update_window_title()
 
-        load_board(self.scene, parent)
+        load_dreamb_cloud(self.scene, parent)
         QTimer.singleShot(0, lambda: self.fit_rect(self.scene.itemsBoundingRect()))
 
         # Context menu and actions
@@ -87,9 +87,8 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         self.init_main_controls()
 
         self.timer = QTimer()
-        clean = self.undo_stack.isClean()
 
-        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, clean, self.parent.presets))
+        self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, self.parent.presets))
         self.timer.start(30000)
 
     @property
@@ -353,7 +352,6 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             item.setPos(QtCore.QPointF(float(item_transforms['x']), float(item_transforms['y'])))
             item.setRotation(item_transforms['rotation'])
             item.setScale(item_transforms['scale'])
-            print('item is at', item.x(), item.y())
         self.on_action_fit_scene()
 
     def on_action_open(self):
@@ -391,9 +389,7 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         self.worker.start()
 
     def do_save_cloud(self):
-        clean = self.undo_stack.isClean()
-        print()
-        self.worker = fileio.ThreadedIO(lambda: save_dreamb_cloud(self.scene, clean, self.parent.presets))
+        self.worker = fileio.ThreadedIO(lambda: save_dreamb_cloud(self.scene, self.parent.presets))
         self.worker.finished.connect(self.on_saving_finished)
         # self.progress = widgets.DreambProgressDialog(
         #    'Saving to cloud...',
@@ -576,6 +572,11 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             new_preset = {"name": preset_name, "images": new_preset_images}
             # add the preset to the presets dict
             self.parent.presets[preset_name] = new_preset
+            QtWidgets.QMessageBox.information(
+                self,
+                'SUCCESS',
+                ('<p>Saved preset with the name %s</p>' % preset_name))
+
         else:
             print('no preset name entered')
 
