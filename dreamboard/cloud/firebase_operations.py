@@ -60,7 +60,7 @@ def upload_to_firebase(file_data, file_name):
         logger.error('Error uploading image to cloud with error: ' + str(e))
 
 
-def save_new_image_to_cloud(doc_ref, item):
+def save_new_image_to_cloud(board_images_col, item):
     # Get image data and upload to Cloud Storage
     data = item.pixmap_to_bytes()
     filepath = os.path.basename(item.filename)
@@ -80,15 +80,16 @@ def save_new_image_to_cloud(doc_ref, item):
         "scale": item.scale(),
         "rotation": item.rotation(),
         "flip": item.flip(),
-        "info_text": item.data(1)['meta']['info_text'],
-        "source_link": item.data(1)['meta']['source_link'],
-        "source_is_local": item.data(1)['meta']['source_is_local'],
+        "info_text": item.data(1)['meta']['info_text'] if item.data(1) else '',
+        "source_link": item.data(1)['meta']['source_link'] if item.data(1) else '',
+        "source_is_local": item.data(1)['meta']['source_is_local'] if item.data(1) else False,
         "created_at": firestore.SERVER_TIMESTAMP
     }
 
     try:
-        doc_ref.document(image_uuid).set(image_data)
+        board_images_col.document(image_uuid).set(image_data)
         logger.info('Saved new image to cloud.')
+        return image_uuid
     except Exception as e:
         logger.error('Error saving new image to cloud with error: ' + str(e))
 
@@ -236,20 +237,37 @@ def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=
             logger.error('Error updating board in cloud with error: ' + str(e))
             return
 
+    update_presets_in_cloud(db, board_ref, local_presets)
+
     board_images_col = db.collection("boards").document(board_ref.id).collection("images")
 
-    update_presets_in_cloud(db, board_ref, local_presets)
+    # Get a list of image ids already in the cloud, on board_images_col
+    cloud_images_docs = board_images_col.stream()
+    cloud_image_ids = [i.id for i in cloud_images_docs]
 
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
-        if (item.isNew):
-            save_new_image_to_cloud(board_ref, item)
+        # if the image is new (i.e. the id is not in the cloud), save it
+        if (item.data(0) not in cloud_image_ids):
+            new_uuid = save_new_image_to_cloud(board_images_col, item)
+            item.setData(0, new_uuid)
+
+        # if the image is in the cloud, update it
         else:
             update_image_in_cloud(board_images_col, item)
 
         # Update the progress if a worker was provided
         if worker:
             worker.progress.emit(i)
+
+    # delete all items in the cloud that were deleted locally, i.e. if the id is in image_ids and not in scene.items
+    for cloud_image_id in cloud_image_ids:
+        if cloud_image_id not in [item.data(0) for item in scene.items()]:
+            try:
+                board_images_col.document(cloud_image_id).delete()
+            except Exception as e:
+                logger.error('Error deleting image from cloud with error: ' + str(e))
+                continue
 
     logger.info('Saved!')
 

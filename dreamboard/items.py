@@ -461,11 +461,8 @@ class DreambPixmapItem(DreambItemMixin, QtWidgets.QGraphicsPixmapItem):
         else:
             super().mouseReleaseEvent(event)
 
-    def setHasChanged(self):
-        self.hasChanged = True
-
-    def setIsNew(self):
-        self.isNew = True
+    def setIsNew(self, value=True):
+        self.isNew = value
 
     def itemChange(self, change, value):
         if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange:

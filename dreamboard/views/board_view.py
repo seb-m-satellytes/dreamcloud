@@ -328,7 +328,8 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
             fileio.load_images,
             filenames,
             self.mapToScene(pos),
-            self.scene)
+            self.scene,
+            self.parent)
         self.worker.progress.connect(self.on_items_loaded)
         self.worker.finished.connect(
             partial(self.on_insert_images_finished,

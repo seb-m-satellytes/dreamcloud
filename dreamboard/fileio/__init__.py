@@ -51,8 +51,9 @@ def save_dreamb(filename, scene, create_new=False, worker=None):
     logger.info('Saved!')
 
 
-def load_images(filenames, pos, scene, worker):
+def load_images(filenames, pos, scene, mainWindow, worker):
     """Add images to existing scene."""
+    print('load_images')
 
     errors = []
     items = []
@@ -66,9 +67,8 @@ def load_images(filenames, pos, scene, worker):
             errors.append(filename)
             continue
 
-        item = DreambPixmapItem(img, filename)
+        item = DreambPixmapItem(img, filename, mainWindow.toggleSidebar)
         item.set_pos_center(pos)
-        item.setHasChanged()
         item.setIsNew()
         scene.add_item_later({'item': item, 'type': 'pixmap'}, selected=True)
         items.append(item)

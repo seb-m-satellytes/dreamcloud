@@ -24,7 +24,9 @@ class SidebarWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def updateItemMetadata(self):
-        if self.current_item is not None:
+        self.current_item.setData(1, {"meta": {}})
+
+        if self.current_item is not None and self.current_item.data(1) is not None:
             metadata = self.current_item.data(1)["meta"]
             metadata["info_text"] = self.info_text.toPlainText()
             metadata["source_link"] = self.source_link.text()
@@ -33,7 +35,14 @@ class SidebarWidget(QtWidgets.QWidget):
 
     def set_current_item(self, item):
         self.current_item = item
-        metadata = item.data(1)['meta']
-        self.info_text.setText(metadata['info_text'])
-        self.source_link.setText(metadata['source_link'])
-        self.source_is_local.setChecked(metadata['source_is_local'])
+        print(item, self.current_item)
+
+        if item is not None and item.data(1) is not None:
+            metadata = item.data(1)['meta']
+            self.info_text.setText(metadata['info_text'])
+            self.source_link.setText(metadata['source_link'])
+            self.source_is_local.setChecked(metadata['source_is_local'])
+        else:
+            self.info_text.setText("")
+            self.source_link.setText("")
+            self.source_is_local.setChecked(False)
