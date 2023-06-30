@@ -247,6 +247,8 @@ def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=
 
     metakeys_to_compare = ['info_text', 'source_link', 'source_is_local']
     # Iterate over each item in the scene
+    properties = ['x', 'y', 'flip', 'rotation', 'scale']
+
     for i, item in enumerate(scene.items()):
         local_image_data = item.data(1)["meta"] if item.data(1) else {}
         cloud_image_data = cloud_images.get(item.data(0))
@@ -261,8 +263,7 @@ def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=
             print('mismatch meta data', item.data(1), cloud_image_data)
             update_image_in_cloud(board_images_col, item)
 
-        elif (item.x() != cloud_image_data.get("x") or item.y() != cloud_image_data.get("y") or item.flip() != cloud_image_data.get("flip") or item.rotation() != cloud_image_data.get("rotation") or item.scale() != cloud_image_data.get("scale")):
-            print('mismatch pos data', item.x(), cloud_image_data.get("x"))
+        if any(getattr(item, prop)() != cloud_image_data.get(prop) for prop in properties):
             update_image_in_cloud(board_images_col, item)
 
         else:
