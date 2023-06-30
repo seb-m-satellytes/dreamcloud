@@ -140,3 +140,4 @@ _site
 .DS_Store
 Scripts
 pyvenv.cfg
+.pdm-python
