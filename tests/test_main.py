@@ -18,7 +18,7 @@ def test_dreamboard_mainwindow_init(show_mock, qapp):
     show_mock.assert_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_dreamboardapplication_fileopenevent(open_mock, qapp, main_window):
     event = MagicMock()
     event.type.return_value = QtCore.QEvent.Type.FileOpen

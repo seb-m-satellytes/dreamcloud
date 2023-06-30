@@ -20,8 +20,6 @@ firebase_config = {
     "client_x509_cert_url": os.getenv('CLIENT_X509_CERT_URL') or os.environ['CLIENT_X509_CERT_URL']
 }
 
-print('!!!=>', firebase_config)
-
 cred = credentials.Certificate(firebase_config)
 
 if not firebase_admin._apps:

@@ -24,7 +24,7 @@ def pytest_configure(config):
 
 @pytest.fixture(autouse=True)
 def commandline_args():
-    config_patcher = patch('dreamboard.view.commandline_args')
+    config_patcher = patch('dreamboard.views.board_view.commandline_args')
     config_mock = config_patcher.start()
     config_mock.filename = None
     yield config_mock
