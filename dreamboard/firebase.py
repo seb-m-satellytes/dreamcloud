@@ -1,8 +1,26 @@
 # dreamboard/firebase.py
+import os
 import firebase_admin
+import base64
+from dotenv import load_dotenv
 from firebase_admin import credentials, firestore, storage
 
-cred = credentials.Certificate('secrets/dreamboard-cloud-firebase-adminsdk-516n3-b042c30828.json')
+load_dotenv()
+
+firebase_config = {
+    "type": os.getenv('TYPE'),
+    "project_id": os.getenv('PROJECT_ID'),
+    "private_key_id": os.getenv('PRIVATE_KEY_ID'),
+    "private_key": base64.b64decode(os.getenv('PRIVATE_KEY')).decode().replace('\\n', '\n'),  # Private keys often have newlines in them
+    "client_email": os.getenv('CLIENT_EMAIL'),
+    "client_id": os.getenv('CLIENT_ID'),
+    "auth_uri": os.getenv('AUTH_URI'),
+    "token_uri": os.getenv('TOKEN_URI'),
+    "auth_provider_x509_cert_url": os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+    "client_x509_cert_url": os.getenv('CLIENT_X509_CERT_URL')
+}
+
+cred = credentials.Certificate(firebase_config)
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred, {
