@@ -1,9 +1,10 @@
 name: pytest
 
-on: [push, pull_request]
+# on: [push, pull_request]
 
 jobs:
   build:
+    environment: prod
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,7 +24,27 @@ jobs:
         run: |
           pip install pdm
           pdm install
+      - name: Setup xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 & echo $! > xvfb.pid
+
       - name: Run tests with pytest
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          TYPE: ${{ secrets.TYPE }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          PRIVATE_KEY_ID: ${{ secrets.PRIVATE_KEY_ID }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          AUTH_URI: ${{ secrets.AUTH_URI }}
+          TOKEN_URI: ${{ secrets.TOKEN_URI }}
+          AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.AUTH_PROVIDER_X509_CERT_URL }}
+          CLIENT_X509_CERT_URL: ${{ secrets.CLIENT_X509_CERT_URL }}
+          UNIVERSE_DOMAIN: ${{ secrets.UNIVERSE_DOMAIN }}
         run: >
-          xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" 
+          . .venv/bin/activate | xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" 
           pdm run coverage run --source=dreamboard -m pytest tests

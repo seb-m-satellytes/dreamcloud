@@ -20,7 +20,7 @@ def test_inits_menu(view, qapp):
     assert view.dreamb_actiongroups
 
 
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_init_without_filename(open_file_mock, qapp, commandline_args):
     commandline_args.filename = None
     parent = QtWidgets.QMainWindow()
@@ -30,7 +30,7 @@ def test_init_without_filename(open_file_mock, qapp, commandline_args):
     del view
 
 
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_init_with_filename(open_file_mock, view, qapp, commandline_args):
     commandline_args.filename = 'test.dreamb'
     parent = QtWidgets.QMainWindow()
@@ -44,7 +44,7 @@ def test_on_scene_changed_when_items(hide_mock, view):
     item = DreambPixmapItem(QtGui.QImage())
     view.scene.addItem(item)
     view.scale(2, 2)
-    with patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect') as r:
+    with patch('dreamboard.views.DreambGraphicsView.recalc_scene_rect') as r:
         view.on_scene_changed(None)
         r.assert_called_once_with()
         hide_mock.assert_called_once_with()
@@ -54,7 +54,7 @@ def test_on_scene_changed_when_items(hide_mock, view):
 @patch('dreamboard.widgets.WelcomeOverlay.show')
 def test_on_scene_changed_when_no_items(show_mock, view):
     view.scale(2, 2)
-    with patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect') as r:
+    with patch('dreamboard.views.DreambGraphicsView.recalc_scene_rect') as r:
         view.on_scene_changed(None)
         r.assert_called()
         show_mock.assert_called_once_with()
@@ -106,7 +106,7 @@ def test_reset_previous_transform_when_same_item(view):
     }
 
 
-@patch('dreamboard.view.DreambGraphicsView.fitInView')
+@patch('dreamboard.views.DreambGraphicsView.fitInView')
 def test_fit_rect_no_toggle(fit_mock, view):
     rect = QtCore.QRectF(30, 40, 100, 80)
     view.previous_transform = {'toggle_item': MagicMock()}
@@ -115,7 +115,7 @@ def test_fit_rect_no_toggle(fit_mock, view):
     assert view.previous_transform is None
 
 
-@patch('dreamboard.view.DreambGraphicsView.fitInView')
+@patch('dreamboard.views.DreambGraphicsView.fitInView')
 def test_fit_rect_toggle_when_no_previous(fit_mock, view):
     item = MagicMock()
     view.previous_transform = None
@@ -131,8 +131,8 @@ def test_fit_rect_toggle_when_no_previous(fit_mock, view):
     assert isinstance(view.previous_transform['center'], QtCore.QPointF)
 
 
-@patch('dreamboard.view.DreambGraphicsView.fitInView')
-@patch('dreamboard.view.DreambGraphicsView.centerOn')
+@patch('dreamboard.views.DreambGraphicsView.fitInView')
+@patch('dreamboard.views.DreambGraphicsView.centerOn')
 def test_fit_rect_toggle_when_previous(center_mock, fit_mock, view):
     item = MagicMock()
     view.previous_transform = {
@@ -148,7 +148,7 @@ def test_fit_rect_toggle_when_previous(center_mock, fit_mock, view):
     assert view.get_scale() == 2
 
 
-@patch('dreamboard.view.DreambGraphicsView.clear_scene')
+@patch('dreamboard.views.DreambGraphicsView.clear_scene')
 def test_open_from_file(clear_mock, view, qtbot):
     root = os.path.dirname(__file__)
     filename = os.path.join(root, 'assets', 'test1item.dreamb')
@@ -195,7 +195,7 @@ def test_on_action_open(dialog_mock, view, qtbot):
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getOpenFileName')
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_on_action_open_when_no_filename(open_mock, dialog_mock, view):
     dialog_mock.return_value = (None, None)
     view.scene.cancel_crop_mode = MagicMock()
@@ -219,7 +219,7 @@ def test_on_action_save_as(dialog_mock, view, imgfilename3x3, tmpdir):
 
 
 @patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName')
-@patch('dreamboard.view.DreambGraphicsView.do_save')
+@patch('dreamboard.views.DreambGraphicsView.do_save')
 def test_on_action_save_as_when_no_filename(
         save_mock, dialog_mock, view, imgfilename3x3):
     item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
@@ -281,7 +281,7 @@ def test_on_action_save(view, qtbot, imgfilename3x3, tmpdir):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('dreamboard.view.DreambGraphicsView.on_action_save_as')
+@patch('dreamboard.views.DreambGraphicsView.on_action_save_as')
 def test_on_action_save_when_no_filename(save_as_mock, view, imgfilename3x3):
     item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
@@ -406,7 +406,7 @@ def test_on_action_copy_text(clipboard_mock, view, imgfilename3x3):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('dreamboard.view.DreambGraphicsView.on_action_fit_scene')
+@patch('dreamboard.views.DreambGraphicsView.on_action_fit_scene')
 @patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_external_new_scene(
@@ -420,7 +420,7 @@ def test_on_action_paste_external_new_scene(
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('dreamboard.view.DreambGraphicsView.on_action_fit_scene')
+@patch('dreamboard.views.DreambGraphicsView.on_action_fit_scene')
 @patch('dreamboard.scene.DreambGraphicsScene.clearSelection')
 @patch('PyQt6.QtGui.QClipboard.image')
 def test_on_action_paste_external_existing_scene(
@@ -480,7 +480,7 @@ def test_on_action_paste_when_empty(img_mock, text_mock, clear_mock, view):
     view.scene.cancel_crop_mode.assert_called_once_with()
 
 
-@patch('dreamboard.view.DreambGraphicsView.on_action_copy')
+@patch('dreamboard.views.DreambGraphicsView.on_action_copy')
 def test_on_action_cut(copy_mock, view, item):
     view.scene.addItem(item)
     item.setSelected(True)
@@ -584,7 +584,7 @@ def test_update_window_title_changes_filename(clear_mock, view):
     assert view.parent.windowTitle() == 'test.dreamb* - DreamBoard'
 
 
-@patch('dreamboard.view.DreambGraphicsView.recalc_scene_rect')
+@patch('dreamboard.views.DreambGraphicsView.recalc_scene_rect')
 @patch('dreamboard.scene.DreambGraphicsScene.on_view_scale_change')
 def test_scale(view_scale_mock, recalc_mock, view):
     view.scale(3.3, 3.3)
@@ -606,8 +606,8 @@ def test_pan_when_no_items(scroll_value_mock, view):
     scroll_value_mock.assert_not_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_zoom_in(pan_mock, reset_mock, view, imgfilename3x3):
     item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scene.addItem(item)
@@ -617,8 +617,8 @@ def test_zoom_in(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_called_once()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_zoom_in_max_zoom_size(pan_mock, reset_mock, view, imgfilename3x3):
     item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scale(10000000, 10000000)
@@ -629,8 +629,8 @@ def test_zoom_in_max_zoom_size(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_not_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_zoom_out(pan_mock, reset_mock, view, imgfilename3x3):
     item = DreambPixmapItem(QtGui.QImage(imgfilename3x3))
     view.scale(100, 100)
@@ -641,8 +641,8 @@ def test_zoom_out(pan_mock, reset_mock, view, imgfilename3x3):
     pan_mock.assert_called_once()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_zoom_out_min_zoom_size(pan_mock, reset_mock, view, item):
     view.scene.addItem(item)
     view.zoom(-40, QtCore.QPointF(10, 10))
@@ -651,8 +651,8 @@ def test_zoom_out_min_zoom_size(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_no_items(pan_mock, reset_mock, view, item):
     view.zoom(40, QtCore.QPointF(10, 10))
     assert view.get_scale() == 1
@@ -660,8 +660,8 @@ def test_no_items(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.reset_previous_transform')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.reset_previous_transform')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_delta_zero(pan_mock, reset_mock, view, item):
     view.scene.addItem(item)
     view.zoom(0, QtCore.QPointF(10, 10))
@@ -670,7 +670,7 @@ def test_delta_zero(pan_mock, reset_mock, view, item):
     pan_mock.assert_not_called()
 
 
-@patch('dreamboard.view.DreambGraphicsView.zoom')
+@patch('dreamboard.views.DreambGraphicsView.zoom')
 def test_wheel_event(zoom_mock, view):
     event = MagicMock()
     event.angleDelta.return_value = QtCore.QPointF(0, 40)
@@ -758,7 +758,7 @@ def test_mouse_press_unhandled(mouse_event_mock, view):
 
 
 @patch('PyQt6.QtWidgets.QGraphicsView.mouseMoveEvent')
-@patch('dreamboard.view.DreambGraphicsView.pan')
+@patch('dreamboard.views.DreambGraphicsView.pan')
 def test_mouse_move_pan(pan_mock, mouse_event_mock, view):
     view.pan_active = True
     view.event_start = QtCore.QPointF(55, 66)
@@ -771,7 +771,7 @@ def test_mouse_move_pan(pan_mock, mouse_event_mock, view):
 
 
 @patch('PyQt6.QtWidgets.QGraphicsView.mouseMoveEvent')
-@patch('dreamboard.view.DreambGraphicsView.zoom')
+@patch('dreamboard.views.DreambGraphicsView.zoom')
 def test_mouse_move_zoom(zoom_mock, mouse_event_mock, view):
     view.zoom_active = True
     view.event_anchor = QtCore.QPointF(55, 66)
@@ -883,7 +883,7 @@ def test_drag_move(view):
     event.acceptProposedAction.assert_called_once()
 
 
-@patch('dreamboard.view.DreambGraphicsView.do_insert_images')
+@patch('dreamboard.views.DreambGraphicsView.do_insert_images')
 def test_drop_when_url(insert_mock, view, imgfilename3x3):
     url = QtCore.QUrl.fromLocalFile(imgfilename3x3)
     mimedata = QtCore.QMimeData()
@@ -896,7 +896,7 @@ def test_drop_when_url(insert_mock, view, imgfilename3x3):
     insert_mock.assert_called_once_with([url], QtCore.QPoint(10, 20))
 
 
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_drop_when_url_dreambfile_and_scene_empty(open_mock, view):
     root = os.path.dirname(__file__)
     filename = os.path.join(root, 'assets', 'test1item.dreamb')
@@ -911,8 +911,8 @@ def test_drop_when_url_dreambfile_and_scene_empty(open_mock, view):
     open_mock.assert_called_once_with(filename)
 
 
-@patch('dreamboard.view.DreambGraphicsView.do_insert_images')
-@patch('dreamboard.view.DreambGraphicsView.open_from_file')
+@patch('dreamboard.views.DreambGraphicsView.do_insert_images')
+@patch('dreamboard.views.DreambGraphicsView.open_from_file')
 def test_drop_when_url_dreambfile_and_scene_not_empty(
         open_mock, insert_mock, view, item):
     view.scene.addItem(item)

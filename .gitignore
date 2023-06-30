@@ -138,3 +138,6 @@ _site
 
 .vscode/
 .DS_Store
+Scripts
+pyvenv.cfg
+.pdm-python

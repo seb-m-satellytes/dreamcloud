@@ -87,7 +87,7 @@ class DreambGraphicsView(MainControlsMixin, QtWidgets.QGraphicsView, ActionsMixi
         self.timer = QTimer()
 
         self.timer.timeout.connect(lambda: save_dreamb_cloud(self.scene, self.parent.presets, self.parent.boards, self.parent.current_board))
-        self.timer.start(30000)
+        self.timer.start(constants.SAVE_INTERVAL_SEC * 1000)
 
     @property
     def filename(self):

@@ -38,3 +38,5 @@ COLORS = {
     'Scene:Canvas': (255, 255, 255),
     'Scene:Text': (200, 200, 200)
 }
+
+SAVE_INTERVAL_SEC = 60
