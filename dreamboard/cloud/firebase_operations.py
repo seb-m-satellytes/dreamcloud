@@ -98,17 +98,17 @@ def update_image_in_cloud(board_images_col, item):
     item_uuid = item.data(0).strip()
 
     updated_image_data = {
-            "x": item.x(),
-            "y": item.y(),
-            "z": item.zValue(),
-            "scale": item.scale(),
-            "rotation": item.rotation(),
-            "flip": item.flip(),
-            "info_text": item.data(1)['meta']['info_text'] if item.data(1) else '',
-            "source_link": item.data(1)['meta']['source_link'] if item.data(1) else '',
-            "source_is_local": item.data(1)['meta']['source_is_local'] if item.data(1) else False,
-            "updated_at": firestore.SERVER_TIMESTAMP
-        }
+        "x": item.x(),
+        "y": item.y(),
+        "z": item.zValue(),
+        "scale": item.scale(),
+        "rotation": item.rotation(),
+        "flip": item.flip(),
+        "info_text": item.data(1)['meta']['info_text'] if item.data(1) else '',
+        "source_link": item.data(1)['meta']['source_link'] if item.data(1) else '',
+        "source_is_local": item.data(1)['meta']['source_is_local'] if item.data(1) else False,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    }
     try:
         board_images_col.document(item_uuid).update(updated_image_data)
         logger.info('Updated image in cloud.')
@@ -246,12 +246,10 @@ def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=
     cloud_images = {doc.id: doc.to_dict() for doc in cloud_images_docs}
 
     metakeys_to_compare = ['info_text', 'source_link', 'source_is_local']
-    poskey_to_compare = ['x', 'y', 'flip','rotation', 'scale']
     # Iterate over each item in the scene
     for i, item in enumerate(scene.items()):
         local_image_data = item.data(1)["meta"] if item.data(1) else {}
         cloud_image_data = cloud_images.get(item.data(0))
-
 
         # if the image is new (i.e. the id is not in the cloud), save it
         if (item.data(0) not in cloud_images):
@@ -264,7 +262,7 @@ def save_dreamb_cloud(scene, local_presets, boards_local=None, current_board_id=
             update_image_in_cloud(board_images_col, item)
 
         elif (item.x() != cloud_image_data.get("x") or item.y() != cloud_image_data.get("y") or item.flip() != cloud_image_data.get("flip") or item.rotation() != cloud_image_data.get("rotation") or item.scale() != cloud_image_data.get("scale")):
-            print('mismatch pos data', item.x(), cloud_image_data.get("x")) 
+            print('mismatch pos data', item.x(), cloud_image_data.get("x"))
             update_image_in_cloud(board_images_col, item)
 
         else:
