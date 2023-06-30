@@ -1,8 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from PyQt6 import QtCore
 
-from dreamboard.__main__ import DreamBoardMainWindow, main
+from dreamboard.__main__ import DreamBoardMainWindow
 from dreamboard.assets import DreambAssets
 from dreamboard.views.board_view import DreambGraphicsView
 
