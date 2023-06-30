@@ -138,3 +138,10 @@ _site
 
 .vscode/
 .DS_Store
+FIREBASE_API_KEY=AIzaSyCNx1fyKMQPDo9F_wsqSIDVavm1eqvoEoMhome = C:\Python311
+include-system-site-packages = false
+version = 3.11.1
+executable = C:\Python311\python.exe
+command = C:\Python311\python.exe -m venv F:\programming\python\dreamcloud
+Scripts
+pyvenv.cfg
